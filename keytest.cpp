@@ -3,12 +3,15 @@
 #include <signal.h>
 #include "RtMidi.h"
 #include <unistd.h>
+#include <map>
+#include <sstream>
 
 using namespace std;
 bool done;
 static void finish(int ignore){ done = true; }
 void midi_read(vector<unsigned char> note);
 void scan_ports();
+string int_to_string(int a);
 void show_usage();
 void list_ports();
 
@@ -37,7 +40,7 @@ int main(int argc, char* argv[]) {
 void scan_ports() {
 	RtMidiIn *midiin = new RtMidiIn();
 	vector<unsigned char> message;
-	int nBytes;
+	//int nBytes;
 	// Check available ports.
 	unsigned int nPorts = midiin->getPortCount();
 	if( nPorts == 0 ) {
@@ -54,14 +57,9 @@ void scan_ports() {
 	cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
 	while( !done ) {
 		midiin->getMessage( &message );
-		nBytes = message.size();
-		if(nBytes > 0) {
-			if( (int)message[0] == 144 && (int)message[1] == 0 && (int)message[2] == 127 )
-				system("ncmpcpp prev");
-			//else if ( message == {144,1,127} )
-			//	system("ncmpcpp toggle");
-			else if ( (int)message[0] == 144 && (int)message[1] == 2 && (int)message[2] == 127 )
-				system("ncmpcpp next");
+		//nBytes = message.size();
+		if(message.size() > 0) {
+			midi_read(message);
 		}
 		usleep(10000);
 	}
@@ -69,14 +67,32 @@ void scan_ports() {
 cleanup:
 	delete midiin;
 }
-void midi_read(vector<unsigned char> note) {
+
+void midi_read(vector<unsigned char> note_raw) {
+	map<string, const char*> note_list;
+	note_list["144,0,127"] = "ncmpcpp prev";
+	note_list["144,1,127"] = "ncmpcpp toggle";
+	note_list["144,2,127"] = "ncmpcpp next";
+	string note;
+	for(unsigned int i = 0; i < note_raw.size(); i++) {
+		note += int_to_string((int)note_raw[i]);
+		if((i + 1) != note_raw.size())
+			note += ",";
+	}
+	system(note_list[note]);
+}
+
+string int_to_string(int a) {
+	ostringstream ss;
+	ss << a;
+	return ss.str();
 }
 
 void show_usage() {
 	cout 
 	<< "Usage: placeholder [OPTION]...\n"
-	<< "  -h, --help    show this help message\n"
-	<< "  -l, --list    list midi input/output ports\n"
+	<< "  -h, --help   show this help message\n"
+	<< "  -l, --list   list midi input/output ports\n"
 	;
 }
 
