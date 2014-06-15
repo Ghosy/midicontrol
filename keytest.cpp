@@ -9,28 +9,29 @@ bool done;
 static void finish(int ignore){ done = true; }
 void midi_read(vector<unsigned char> note);
 void scan_ports();
-void show_help();
+void show_usage();
 void list_ports();
 
 int main(int argc, char* argv[]) {
 	if(argc == 1) {
 		scan_ports();
+		return 0;
 	}
-	char arg_char;
-	while((arg_char = getopt(argc,argv,"hl")) != -1) {
-		switch(arg_char) {
-			case 'h':
-				show_help();
-			break;
-			case 'l':
-				list_ports();
-			break;
-			default:
-				scan_ports();
-			break;
+	for(int i = 1; i < argc; ++i) {
+		string arg = argv[i];
+		if((arg == "-h") || (arg == "--help")) {
+			show_usage();
+			return 0;
+		}
+		else if((arg == "-l") || (arg == "--list")) {
+			list_ports();
+			return 0;
+		}
+		else {
+			scan_ports();
+			return 0;
 		}
 	}
-	return 0;
 }
 
 void scan_ports() {
@@ -71,7 +72,12 @@ cleanup:
 void midi_read(vector<unsigned char> note) {
 }
 
-void show_help() {
+void show_usage() {
+	cout 
+	<< "Usage: placeholder [OPTION]...\n"
+	<< "  -h, --help    show this help message\n"
+	<< "  -l, --list    list midi input/output ports\n"
+	;
 }
 
 void list_ports() {
