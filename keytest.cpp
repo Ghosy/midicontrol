@@ -1,46 +1,48 @@
 #include <iostream>
 #include <cstdlib>
 #include <signal.h>
-#include "RtMidi.h"
 #include <unistd.h>
 #include <map>
 #include <sstream>
 
+#include "keytest.h"
+#include "RtMidi.h"
+
 using namespace std;
 bool done;
 static void finish(int ignore){ done = true; }
-void midi_read(vector<unsigned char> note);
-void scan_ports();
-string int_to_string(int a);
-void show_usage();
-void list_ports();
+// void midi_read(vector<unsigned char> note);
+// void scan_ports();
+// string int_to_string(int a);
+// void show_usage();
+// void list_ports();
 
 int main(int argc, char* argv[]) {
+	// If no arguements
 	if(argc == 1) {
 		scan_ports();
 		return 0;
 	}
+	// Cases for all arguements
 	for(int i = 1; i < argc; ++i) {
 		string arg = argv[i];
 		if((arg == "-h") || (arg == "--help")) {
 			show_usage();
-			return 0;
 		}
 		else if((arg == "-l") || (arg == "--list")) {
 			list_ports();
-			return 0;
 		}
+		// If the arguement is not supported show_usage
 		else {
-			scan_ports();
-			return 0;
+			show_usage();
 		}
+		return 0;
 	}
 }
 
 void scan_ports() {
 	RtMidiIn *midiin = new RtMidiIn();
 	vector<unsigned char> message;
-	//int nBytes;
 	// Check available ports.
 	unsigned int nPorts = midiin->getPortCount();
 	if( nPorts == 0 ) {
@@ -57,7 +59,6 @@ void scan_ports() {
 	cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
 	while( !done ) {
 		midiin->getMessage( &message );
-		//nBytes = message.size();
 		if(message.size() > 0) {
 			midi_read(message);
 		}
@@ -69,10 +70,12 @@ cleanup:
 }
 
 void midi_read(vector<unsigned char> note_raw) {
+	// Map  midi notes = key  commands = values
 	map<string, const char*> note_list;
 	note_list["144,0,127"] = "ncmpcpp prev";
 	note_list["144,1,127"] = "ncmpcpp toggle";
 	note_list["144,2,127"] = "ncmpcpp next";
+	// Converts vector to readable string
 	string note;
 	for(unsigned int i = 0; i < note_raw.size(); i++) {
 		note += int_to_string((int)note_raw[i]);
@@ -89,6 +92,7 @@ string int_to_string(int a) {
 }
 
 void show_usage() {
+	// Prints usage/help information
 	cout 
 	<< "Usage: placeholder [OPTION]...\n"
 	<< "  -h, --help   show this help message\n"
