@@ -7,6 +7,7 @@
 
 #include "keytest.h"
 #include "RtMidi.h"
+#include "settings.h"
 
 using namespace std;
 bool done;
@@ -41,6 +42,7 @@ int main(int argc, char* argv[]) {
 }
 
 void scan_ports() {
+	settings.read();
 	RtMidiIn *midiin = new RtMidiIn();
 	vector<unsigned char> message;
 	// Check available ports.
@@ -71,10 +73,10 @@ cleanup:
 
 void midi_read(vector<unsigned char> note_raw) {
 	// Map  midi notes = key  commands = values
-	map<string, const char*> note_list;
-	note_list["144,0,127"] = "ncmpcpp prev";
-	note_list["144,1,127"] = "ncmpcpp toggle";
-	note_list["144,2,127"] = "ncmpcpp next";
+	// map<string, const char*> note_list;
+	// note_list["144,0,127"] = "ncmpcpp prev";
+	// note_list["144,1,127"] = "ncmpcpp toggle";
+	// note_list["144,2,127"] = "ncmpcpp next";
 	// Converts vector to readable string
 	string note;
 	for(unsigned int i = 0; i < note_raw.size(); i++) {
@@ -82,7 +84,7 @@ void midi_read(vector<unsigned char> note_raw) {
 		if((i + 1) != note_raw.size())
 			note += ",";
 	}
-	system(note_list[note]);
+	system(settings.note_list[note].c_str());
 }
 
 string int_to_string(int a) {
