@@ -33,6 +33,16 @@ int main(int argc, char* argv[]) {
 		else if((arg == "-l") || (arg == "--list")) {
 			list_ports();
 		}
+		else if((arg == "-c") || (arg == "--config")) {
+			if(++i <= argc) {
+				// This should be integrated before this check area
+				settings.commandline_config(argv[i]);
+				scan_ports();
+			}
+			else {
+				cout << "No Config file was specified." << endl;
+			}
+		}
 		// If the arguement is not supported show_usage
 		else {
 			show_usage();
@@ -97,8 +107,9 @@ void show_usage() {
 	// Prints usage/help information
 	cout 
 	<< "Usage: placeholder [OPTION]...\n"
-	<< "  -h, --help   show this help message\n"
-	<< "  -l, --list   list midi input/output ports\n"
+	<< "  -h, --help      show this help message\n"
+	<< "  -l, --list      list midi input/output ports\n"
+	<< "  -c, --config    Load alternate configuration file\n"
 	;
 }
 

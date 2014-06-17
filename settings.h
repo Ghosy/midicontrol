@@ -4,10 +4,14 @@
 #include <map>
 
 struct config {
-
+	config();
+	
 	void read();
+	void commandline_config(char*);
 	std::map<std::string, std::string> note_list;
 
+private:
+	std::string config_file_path;
 };
 
 extern config settings;

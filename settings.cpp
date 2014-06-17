@@ -8,8 +8,12 @@ using namespace std;
 
 config settings;
 
+config::config() {
+	config_file_path = "keyconf";
+}
+
 void config::read() {
-	ifstream f("keyconf");
+	ifstream f(config_file_path.c_str());
 	string cline, name, value;
 	
 	if(!f.is_open())
@@ -28,3 +32,8 @@ void config::read() {
 		}
 	}
 }
+
+void config::commandline_config(char* conf_path) {
+	config_file_path = conf_path;
+}
+
