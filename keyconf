@@ -1,4 +1,4 @@
-device=test
+device=Launchpad 36:0
 144,0,127=mpc prev
 144,1,127=mpc toggle
 144,2,127=mpc next

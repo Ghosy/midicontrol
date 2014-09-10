@@ -9,6 +9,7 @@ struct config {
 	void read();
 	void commandline_config(char*);
 	std::map<std::string, std::string> note_list;
+	std::string getDevice();
 
 private:
 	std::string config_file_path;

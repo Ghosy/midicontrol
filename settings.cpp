@@ -42,3 +42,7 @@ void config::read() {
 void config::commandline_config(char* conf_path) {
 	config_file_path = conf_path;
 }
+
+string config::getDevice() {
+	return midi_device;
+}

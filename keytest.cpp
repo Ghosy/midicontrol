@@ -53,15 +53,27 @@ int main(int argc, char* argv[]) {
 
 void scan_ports() {
 	settings.read();
-	RtMidiIn *midiin = new RtMidiIn();
+	RtMidiIn *midiin;
+	try {
+		midiin = new RtMidiIn();
+	}
+	catch ( RtMidiError &error ) {
+		error.printMessage();
+		exit( EXIT_FAILURE );
+	}
 	vector<unsigned char> message;
+	
 	// Check available ports.
 	unsigned int nPorts = midiin->getPortCount();
 	if( nPorts == 0 ) {
 		cout << "No ports available!\n";
 		goto cleanup;
 	}
-	midiin->openPort(2);
+	for(unsigned int i = 0; i < nPorts; i++) {
+		if(midiin->getPortName(i) == settings.getDevice()) {
+			midiin->openPort(i);
+		}
+	}
 	// Don't ignore sysex, timing, or active sensing messages.
 	midiin->ignoreTypes( false, false, false );
 	// Install an interrupt handler function.
