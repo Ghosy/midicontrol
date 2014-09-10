@@ -10,6 +10,7 @@ config settings;
 
 config::config() {
 	config_file_path = "keyconf";
+	midi_device = "";
 }
 
 void config::read() {
@@ -28,7 +29,12 @@ void config::read() {
 
 			name = cline.substr(0, pos);
 			value = cline.substr(pos + 1, cline.length() - pos);
-			note_list[name] = value;
+			if(name == "device") {
+				midi_device = value;
+			}
+			else {
+				note_list[name] = value;
+			}
 		}
 	}
 }
@@ -36,4 +42,3 @@ void config::read() {
 void config::commandline_config(char* conf_path) {
 	config_file_path = conf_path;
 }
-

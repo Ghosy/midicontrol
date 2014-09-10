@@ -61,7 +61,7 @@ void scan_ports() {
 		cout << "No ports available!\n";
 		goto cleanup;
 	}
-	midiin->openPort(3);
+	midiin->openPort(2);
 	// Don't ignore sysex, timing, or active sensing messages.
 	midiin->ignoreTypes( false, false, false );
 	// Install an interrupt handler function.

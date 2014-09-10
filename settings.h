@@ -12,6 +12,7 @@ struct config {
 
 private:
 	std::string config_file_path;
+	std::string midi_device;
 };
 
 extern config settings;
