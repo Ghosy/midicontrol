@@ -12,11 +12,6 @@
 using namespace std;
 bool done;
 static void finish(int ignore){ done = true; }
-// void midi_read(vector<unsigned char> note);
-// void scan_ports();
-// string int_to_string(int a);
-// void show_usage();
-// void list_ports();
 
 int main(int argc, char* argv[]) {
 	// If no arguements
@@ -70,7 +65,10 @@ void scan_ports() {
 		goto cleanup;
 	}
 	for(unsigned int i = 0; i < nPorts; i++) {
-		if(midiin->getPortName(i) == settings.getDevice()) {
+		string s = midiin->getPortName(i);
+		s = s.substr(0, s.find_last_of(' '));
+		
+		if(s == settings.getDevice()) {
 			midiin->openPort(i);
 		}
 	}
