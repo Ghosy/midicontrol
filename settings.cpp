@@ -27,8 +27,9 @@ void config::read() {
 			int pos;
 			pos = cline.find("=");
 
-			name = cline.substr(0, pos);
-			value = cline.substr(pos + 1, cline.length() - pos);
+			name = trim(cline.substr(0, pos));
+			value = trim(cline.substr(pos + 1, cline.length() - pos));
+
 			if(name == "device") {
 				midi_device = value;
 			}
@@ -45,4 +46,12 @@ void config::commandline_config(char* conf_path) {
 
 string config::getDevice() {
 	return midi_device;
+}
+
+string config::trim(string s) {
+	size_t startpos = s.find_first_not_of(" \n\r\t");
+	s = s.substr(startpos);
+	size_t endpos = s.find_last_not_of(" \n\r\t");
+	s = s.substr(0, endpos + 1);
+	return s;
 }
