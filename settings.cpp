@@ -4,8 +4,6 @@
 
 #include "settings.h"
 
-using namespace std;
-
 config settings;
 
 config::config() {
@@ -14,8 +12,8 @@ config::config() {
 }
 
 void config::read() {
-	ifstream f(config_file_path.c_str());
-	string cline, name, value;
+	std::ifstream f(config_file_path.c_str());
+	std::string cline, name, value;
 	
 	if(!f.is_open())
 		return;
@@ -44,11 +42,11 @@ void config::commandline_config(const char* conf_path) {
 	config_file_path = conf_path;
 }
 
-string config::getDevice() {
+std::string config::getDevice() {
 	return midi_device;
 }
 
-string config::trim(string s) {
+std::string config::trim(std::string s) {
 	size_t startpos = s.find_first_not_of(" \n\r\t");
 	s = s.substr(startpos);
 	size_t endpos = s.find_last_not_of(" \n\r\t");
