@@ -107,7 +107,7 @@ void midi_read(vector<unsigned char> note_raw) {
 	system(settings.note_list[note].c_str());
 }
 
-string int_to_string(int a) {
+string int_to_string(const int a) {
 	ostringstream ss;
 	ss << a;
 	return ss.str();

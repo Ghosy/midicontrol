@@ -40,7 +40,7 @@ void config::read() {
 	}
 }
 
-void config::commandline_config(char* conf_path) {
+void config::commandline_config(const char* conf_path) {
 	config_file_path = conf_path;
 }
 

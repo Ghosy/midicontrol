@@ -7,7 +7,7 @@ struct config {
 	config();
 	
 	void read();
-	void commandline_config(char*);
+	void commandline_config(const char*);
 	std::map<std::string, std::string> note_list;
 	std::string getDevice();
 

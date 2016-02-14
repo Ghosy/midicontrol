@@ -5,7 +5,7 @@
 
 void midi_read(std::vector<unsigned char> note);
 void scan_ports();
-std::string int_to_string(int a);
+std::string int_to_string(const int a);
 void show_usage();
 void list_ports();
 
