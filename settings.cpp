@@ -1,6 +1,8 @@
 #include <map>
+#include <vector>
 #include <fstream>
-#include <iostream>
+//#include <iostream>
+#include <sstream>
 
 #include "settings.h"
 
@@ -32,7 +34,15 @@ void config::read() {
 				midi_device = value;
 			}
 			else {
-				note_list[name] = value;
+				std::vector<std::string> entry_list;
+				std::stringstream ss(value);
+				std::string temp;
+				char delim = ',';
+
+				while(getline(ss, temp, delim)) {
+					entry_list.push_back(temp);
+				}
+				note_list[name] = entry_list;
 			}
 		}
 	}

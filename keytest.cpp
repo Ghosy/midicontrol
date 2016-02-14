@@ -104,7 +104,9 @@ void midi_read(vector<unsigned char> note_raw) {
 		if((i + 1) != note_raw.size())
 			note += ",";
 	}
-	system(settings.note_list[note].c_str());
+	if(settings.note_list.count(note)) {
+		system(settings.note_list[note].at(0).c_str());
+	}
 }
 
 string int_to_string(const int a) {
