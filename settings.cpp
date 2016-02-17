@@ -40,7 +40,7 @@ void config::read() {
 				char delim = ',';
 
 				while(getline(ss, temp, delim)) {
-					entry_list.push_back(temp);
+					entry_list.push_back(trim(temp));
 				}
 				note_list[name] = entry_list;
 			}

@@ -10,6 +10,8 @@
 #include "settings.h"
 
 using namespace std;
+RtMidiIn *midiin;
+RtMidiOut *midiout;
 bool done;
 static void finish(int ignore){ done = true; }
 
@@ -48,9 +50,9 @@ int main(int argc, char* argv[]) {
 
 void scan_ports() {
 	settings.read();
-	RtMidiIn *midiin;
 	try {
 		midiin = new RtMidiIn();
+		midiout = new RtMidiOut();
 	}
 	catch ( RtMidiError &error ) {
 		error.printMessage();
@@ -70,6 +72,7 @@ void scan_ports() {
 		
 		if(s == settings.getDevice()) {
 			midiin->openPort(i);
+			midiout->openPort(i);
 		}
 	}
 	// Don't ignore sysex, timing, or active sensing messages.
@@ -89,6 +92,7 @@ void scan_ports() {
 	// Clean up
 cleanup:
 	delete midiin;
+	delete midiout;
 }
 
 void midi_read(vector<unsigned char> note_raw) {
@@ -106,6 +110,21 @@ void midi_read(vector<unsigned char> note_raw) {
 	}
 	if(settings.note_list.count(note)) {
 		system(settings.note_list[note].at(0).c_str());
+		if(settings.note_list[note].size() >= 2) {
+			vector<unsigned char> message;
+
+			if( settings.note_list[note].at(1) == "light_on") {
+				message.push_back(144);
+				message.push_back(1);
+				message.push_back(stoi(settings.note_list[note].at(2)));
+			}
+			if( settings.note_list[note].at(1) == "light_off") {
+				message.push_back(144);
+				message.push_back(1);
+				message.push_back(0);
+			}
+			midiout->sendMessage(&message);
+		}
 	}
 }
 
