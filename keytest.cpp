@@ -9,7 +9,7 @@
 #include "RtMidi.h"
 #include "settings.h"
 
-using namespace std;
+//using namespace std;
 RtMidiIn *midiin;
 RtMidiOut *midiout;
 bool done;
@@ -23,7 +23,7 @@ int main(int argc, char* argv[]) {
 	}
 	// Cases for all arguements
 	for(int i = 1; i < argc; ++i) {
-		string arg = argv[i];
+		std::string arg = argv[i];
 		if((arg == "-h") || (arg == "--help")) {
 			show_usage();
 		}
@@ -37,7 +37,7 @@ int main(int argc, char* argv[]) {
 				scan_ports();
 			}
 			else {
-				cout << "No Config file was specified." << endl;
+				std::cout << "No Config file was specified." << std::endl;
 			}
 		}
 		// If the arguement is not supported show_usage
@@ -58,16 +58,16 @@ void scan_ports() {
 		error.printMessage();
 		exit( EXIT_FAILURE );
 	}
-	vector<unsigned char> message;
+	std::vector<unsigned char> message;
 	
 	// Check available ports.
 	unsigned int nPorts = midiin->getPortCount();
 	if( nPorts == 0 ) {
-		cout << "No ports available!\n";
+		std::cout << "No ports available!\n";
 		goto cleanup;
 	}
 	for(unsigned int i = 0; i < nPorts; i++) {
-		string s = midiin->getPortName(i);
+		std::string s = midiin->getPortName(i);
 		s = s.substr(0, s.find_last_of(' '));
 		
 		if(s == settings.getDevice()) {
@@ -81,7 +81,7 @@ void scan_ports() {
 	done = false;
 	(void) signal(SIGINT, finish);
 	// Periodically check input queue.
-	cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
+	std::cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
 	while( !done ) {
 		midiin->getMessage( &message );
 		if(message.size() > 0) {
@@ -95,11 +95,11 @@ cleanup:
 	delete midiout;
 }
 
-void midi_read(vector<unsigned char> note_raw) {
-	// Converts vector to human readable string
-	// string note;
+void midi_read(std::vector<unsigned char> note_raw) {
+	// Converts vector to human readable std::string
+	// std::string note;
 	// for(unsigned int i = 0; i < note_raw.size(); i++) {
-	// 	note += int_to_string((int)note_raw[i]);
+	// 	note += int_to_std::string((int)note_raw[i]);
 	// 	if((i + 1) != note_raw.size())
 	// 		note += ",";
 	// }
@@ -109,7 +109,7 @@ void midi_read(vector<unsigned char> note_raw) {
 
 		// Led code
 		if(settings.note_list[note_raw].size() >= 2) {
-			vector<unsigned char> message;
+			std::vector<unsigned char> message;
 
 			if( settings.note_list[note_raw].at(1) == "light_on") {
 				message.push_back(144);
@@ -127,15 +127,15 @@ void midi_read(vector<unsigned char> note_raw) {
 }
 
 // May be useless now
-string int_to_string(const int a) {
-	ostringstream ss;
+std::string int_to_string(const int a) {
+	std::ostringstream ss;
 	ss << a;
 	return ss.str();
 }
 
 void show_usage() {
 	// Prints usage/help information
-	cout 
+	std::cout 
 	<< "Usage: placeholder [OPTION]...\n"
 	<< "  -h, --help      show this help message\n"
 	<< "  -l, --list      list midi input/output ports\n"
@@ -156,8 +156,8 @@ void list_ports() {
 	}
 	// Check inputs.
 	unsigned int nPorts = midiin->getPortCount();
-	cout << "\nThere are " << nPorts << " MIDI input sources available.\n";
-	string portName;
+	std::cout << "\nThere are " << nPorts << " MIDI input sources available.\n";
+	std::string portName;
 	for ( unsigned int i=0; i<nPorts; i++ ) {
 		try {
 			portName = midiin->getPortName(i);
@@ -166,7 +166,7 @@ void list_ports() {
 			error.printMessage();
 			goto cleanup;
 		}
-		cout << "  Input Port #" << i << ": " << portName << '\n';
+		std::cout << "  Input Port #" << i << ": " << portName << '\n';
 	}
 	// RtMidiOut constructor
 	try {
@@ -178,7 +178,7 @@ void list_ports() {
 	}
 	// Check outputs.
 	nPorts = midiout->getPortCount();
-	cout << "\nThere are " << nPorts << " MIDI output ports available.\n";
+	std::cout << "\nThere are " << nPorts << " MIDI output ports available.\n";
 	for ( unsigned int i=0; i<nPorts; i++ ) {
 		try {
 			portName = midiout->getPortName(i);
@@ -187,9 +187,9 @@ void list_ports() {
 			error.printMessage();
 			goto cleanup;
 		}
-		cout << "  Output Port #" << i << ": " << portName << '\n';
+		std::cout << "  Output Port #" << i << ": " << portName << '\n';
 	}
-	cout << '\n';
+	std::cout << '\n';
 	// Clean up
 cleanup:
 	delete midiin;
