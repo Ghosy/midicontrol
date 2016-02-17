@@ -126,13 +126,6 @@ void midi_read(std::vector<unsigned char> note_raw) {
 	}
 }
 
-// May be useless now
-std::string int_to_string(const int a) {
-	std::ostringstream ss;
-	ss << a;
-	return ss.str();
-}
-
 void show_usage() {
 	// Prints usage/help information
 	std::cout 
