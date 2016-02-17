@@ -113,12 +113,12 @@ void midi_read(std::vector<unsigned char> note_raw) {
 
 			if( settings.note_list[note_raw].at(1) == "light_on") {
 				message.push_back(144);
-				message.push_back(1);
+				message.push_back(note_raw[1]);
 				message.push_back(stoi(settings.note_list[note_raw].at(2)));
 			}
 			if( settings.note_list[note_raw].at(1) == "light_off") {
 				message.push_back(144);
-				message.push_back(1);
+				message.push_back(note_raw[1]);
 				message.push_back(0);
 			}
 			midiout->sendMessage(&message);
