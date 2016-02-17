@@ -8,7 +8,7 @@ struct config {
 	
 	void read();
 	void commandline_config(const char*);
-	std::map<std::string, std::vector<std::string> > note_list;
+	std::map<std::vector<unsigned char>, std::vector<std::string> > note_list;
 	// std::vector<std::string> entry_list;
 	std::string getDevice();
 

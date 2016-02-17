@@ -96,29 +96,27 @@ cleanup:
 }
 
 void midi_read(vector<unsigned char> note_raw) {
-	// Map  midi notes = key  commands = values
-	// map<string, const char*> note_list;
-	// note_list["144,0,127"] = "ncmpcpp prev";
-	// note_list["144,1,127"] = "ncmpcpp toggle";
-	// note_list["144,2,127"] = "ncmpcpp next";
-	// Converts vector to readable string
-	string note;
-	for(unsigned int i = 0; i < note_raw.size(); i++) {
-		note += int_to_string((int)note_raw[i]);
-		if((i + 1) != note_raw.size())
-			note += ",";
-	}
-	if(settings.note_list.count(note)) {
-		system(settings.note_list[note].at(0).c_str());
-		if(settings.note_list[note].size() >= 2) {
+	// Converts vector to human readable string
+	// string note;
+	// for(unsigned int i = 0; i < note_raw.size(); i++) {
+	// 	note += int_to_string((int)note_raw[i]);
+	// 	if((i + 1) != note_raw.size())
+	// 		note += ",";
+	// }
+	if(settings.note_list.count(note_raw)) {
+		// This should be broken up, very unreadable
+		system(settings.note_list[note_raw].at(0).c_str());
+
+		// Led code
+		if(settings.note_list[note_raw].size() >= 2) {
 			vector<unsigned char> message;
 
-			if( settings.note_list[note].at(1) == "light_on") {
+			if( settings.note_list[note_raw].at(1) == "light_on") {
 				message.push_back(144);
 				message.push_back(1);
-				message.push_back(stoi(settings.note_list[note].at(2)));
+				message.push_back(stoi(settings.note_list[note_raw].at(2)));
 			}
-			if( settings.note_list[note].at(1) == "light_off") {
+			if( settings.note_list[note_raw].at(1) == "light_off") {
 				message.push_back(144);
 				message.push_back(1);
 				message.push_back(0);
@@ -128,6 +126,7 @@ void midi_read(vector<unsigned char> note_raw) {
 	}
 }
 
+// May be useless now
 string int_to_string(const int a) {
 	ostringstream ss;
 	ss << a;

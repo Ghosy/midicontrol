@@ -34,15 +34,25 @@ void config::read() {
 				midi_device = value;
 			}
 			else {
-				std::vector<std::string> entry_list;
-				std::stringstream ss(value);
 				std::string temp;
 				char delim = ',';
 
-				while(getline(ss, temp, delim)) {
+				// Break up note and place into vector
+				std::vector<unsigned char> midi_note;
+				std::stringstream ss(name);
+
+				while(getline(ss, temp, delim))
+					midi_note.push_back((unsigned char)stoi(temp));
+
+				// Break up after =
+				std::vector<std::string> entry_list;
+				ss.clear();
+				ss.str(value);
+
+				while(getline(ss, temp, delim))
 					entry_list.push_back(trim(temp));
-				}
-				note_list[name] = entry_list;
+
+				note_list[midi_note] = entry_list;
 			}
 		}
 	}
