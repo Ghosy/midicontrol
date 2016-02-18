@@ -1,4 +1,4 @@
-#include <iostream>
+#include <iosfwd>
 #include <signal.h>
 #include <unistd.h>
 #include <sstream>
@@ -52,15 +52,15 @@ void scan_ports() {
 		midiin = new RtMidiIn();
 		midiout = new RtMidiOut();
 	}
-	catch (RtMidiError &error ) {
+	catch (RtMidiError &error) {
 		error.printMessage();
-		exit(EXIT_FAILURE );
+		exit(EXIT_FAILURE);
 	}
 	std::vector<unsigned char> message;
 	
 	// Check available ports.
 	unsigned int nPorts = midiin->getPortCount();
-	if(nPorts == 0 ) {
+	if(nPorts == 0) {
 		std::cout << "No ports available!\n";
 		goto cleanup;
 	}
@@ -75,14 +75,14 @@ void scan_ports() {
 		}
 	}
 	// Don't ignore sysex, timing, or active sensing messages.
-	midiin->ignoreTypes(false, false, false );
+	midiin->ignoreTypes(false, false, false);
 	// Install an interrupt handler function.
 	done = false;
 	(void) signal(SIGINT, finish);
 	// Periodically check input queue.
 	std::cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
-	while(!done ) {
-		midiin->getMessage(&message );
+	while(!done) {
+		midiin->getMessage(&message);
 		if(message.size() > 0) {
 			midi_read(message);
 		}
@@ -135,19 +135,19 @@ void list_ports() {
 	try {
 		midiin = new RtMidiIn();
 	}
-	catch (RtMidiError &error ) {
+	catch (RtMidiError &error) {
 		error.printMessage();
-		exit(EXIT_FAILURE );
+		exit(EXIT_FAILURE);
 	}
 	// Check inputs.
 	unsigned int nPorts = midiin->getPortCount();
 	std::cout << "\nThere are " << nPorts << " MIDI input sources available.\n";
 	std::string portName;
-	for (unsigned int i=0; i<nPorts; i++ ) {
+	for (unsigned int i=0; i<nPorts; i++) {
 		try {
 			portName = midiin->getPortName(i);
 		}
-		catch (RtMidiError &error ) {
+		catch (RtMidiError &error) {
 			error.printMessage();
 			goto cleanup;
 		}
@@ -157,14 +157,14 @@ void list_ports() {
 	try {
 		midiout = new RtMidiOut();
 	}
-	catch (RtMidiError &error ) {
+	catch (RtMidiError &error) {
 		error.printMessage();
-		exit(EXIT_FAILURE );
+		exit(EXIT_FAILURE);
 	}
 	// Check outputs.
 	nPorts = midiout->getPortCount();
 	std::cout << "\nThere are " << nPorts << " MIDI output ports available.\n";
-	for (unsigned int i=0; i<nPorts; i++ ) {
+	for (unsigned int i=0; i<nPorts; i++) {
 		try {
 			portName = midiout->getPortName(i);
 		}
