@@ -1,18 +1,16 @@
 #include <iostream>
-#include <cstdlib>
 #include <signal.h>
 #include <unistd.h>
-#include <map>
 #include <sstream>
 
 #include "keytest.h"
 #include "RtMidi.h"
 #include "settings.h"
 
-//using namespace std;
 RtMidiIn *midiin;
 RtMidiOut *midiout;
 bool done;
+
 static void finish(int ignore){ done = true; }
 
 int main(int argc, char* argv[]) {
@@ -66,6 +64,7 @@ void scan_ports() {
 		std::cout << "No ports available!\n";
 		goto cleanup;
 	}
+	// Go threw ports and open the configured device
 	for(unsigned int i = 0; i < nPorts; i++) {
 		std::string s = midiin->getPortName(i);
 		s = s.substr(0, s.find_last_of(' '));
@@ -96,13 +95,6 @@ cleanup:
 }
 
 void midi_read(std::vector<unsigned char> note_raw) {
-	// Converts vector to human readable std::string
-	// std::string note;
-	// for(unsigned int i = 0; i < note_raw.size(); i++) {
-	// 	note += int_to_std::string((int)note_raw[i]);
-	// 	if((i + 1) != note_raw.size())
-	// 		note += ",";
-	// }
 	if(settings.note_list.count(note_raw)) {
 		// This should be broken up, very unreadable
 		system(settings.note_list[note_raw].at(0).c_str());
