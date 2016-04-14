@@ -95,25 +95,26 @@ cleanup:
 }
 
 void midi_read(std::vector<unsigned char> note_raw) {
-	if(settings.note_list.count(note_raw)) {
-		// This should be broken up, very unreadable
-		system(settings.note_list[note_raw].at(0).c_str());
+	for (auto it = settings.note_list.begin(); it != settings.note_list.end(); ++it) {
+		if(it->first.contains(note_raw)) {
+			// Do the action associated with the corresponding midi note
+			system(it->second[0].c_str());
 
-		// Led code
-		if(settings.note_list[note_raw].size() >= 2) {
-			std::vector<unsigned char> message;
-
-			if(settings.note_list[note_raw].at(1) == "light_on") {
-				message.push_back(144);
-				message.push_back(note_raw[1]);
-				message.push_back(stoi(settings.note_list[note_raw].at(2)));
+			// Led code
+			if(it->second.size() >= 2) {
+				std::vector<unsigned char> message;
+				if(it->second[1] == "light_on") {
+					message.push_back(144);
+					message.push_back(note_raw[1]);
+					message.push_back(stoi(it->second[2]));
+				}
+				if(it->second[1] == "light_off") {
+					message.push_back(144);
+					message.push_back(note_raw[1]);
+					message.push_back(0);
+				}
+				midiout->sendMessage(&message);
 			}
-			if(settings.note_list[note_raw].at(1) == "light_off") {
-				message.push_back(144);
-				message.push_back(note_raw[1]);
-				message.push_back(0);
-			}
-			midiout->sendMessage(&message);
 		}
 	}
 }
