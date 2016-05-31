@@ -4,7 +4,7 @@
 #include <sstream>
 
 #include "keytest.h"
-#include "RtMidi.h"
+#include "rtmidi/RtMidi.h"
 #include "settings.h"
 
 RtMidiIn *midiin;
@@ -74,18 +74,17 @@ void scan_ports() {
 			midiout->openPort(i);
 		}
 	}
+	// Set callback function
+	// Make sure this always follows opening of port
+	// to prevent messages ending up in queue
+	midiin->setCallback(&midi_read);
 	// Don't ignore sysex, timing, or active sensing messages.
 	midiin->ignoreTypes(false, false, false);
 	// Install an interrupt handler function.
 	done = false;
 	(void) signal(SIGINT, finish);
-	// Periodically check input queue.
 	std::cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
 	while(!done) {
-		midiin->getMessage(&message);
-		if(message.size() > 0) {
-			midi_read(message);
-		}
 		usleep(10000);
 	}
 	// Clean up
@@ -94,23 +93,23 @@ cleanup:
 	delete midiout;
 }
 
-void midi_read(std::vector<unsigned char> note_raw) {
+void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
 	for (auto it = settings.note_list.begin(); it != settings.note_list.end(); ++it) {
-		if(it->first.contains(note_raw)) {
+		if(it->first.contains(*note_raw)) {
 			// Do the action associated with the corresponding midi note
 			system(it->second[0].c_str());
 
-			// Led code
+			// Led handling
 			if(it->second.size() >= 2) {
 				std::vector<unsigned char> message;
 				if(it->second[1] == "light_on") {
 					message.push_back(144);
-					message.push_back(note_raw[1]);
+					message.push_back((int)note_raw->at(1));
 					message.push_back(stoi(it->second[2]));
 				}
 				if(it->second[1] == "light_off") {
 					message.push_back(144);
-					message.push_back(note_raw[1]);
+					message.push_back((int)note_raw->at(1));
 					message.push_back(0);
 				}
 				midiout->sendMessage(&message);

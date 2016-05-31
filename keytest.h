@@ -3,7 +3,7 @@
 
 #include <vector>
 
-void midi_read(std::vector<unsigned char> note);
+void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata);
 void scan_ports();
 void show_usage();
 void list_ports();
