@@ -1,6 +1,8 @@
 #include <iosfwd>
 #include <signal.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 #include <sstream>
 
 #include "keytest.h"
@@ -96,8 +98,20 @@ cleanup:
 void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
 	for (auto it = settings.note_list.begin(); it != settings.note_list.end(); ++it) {
 		if(it->first.contains(*note_raw)) {
-			// Do the action associated with the corresponding midi note
-			system(it->second[0].c_str());
+			
+			// Fork for command to be run
+			pid_t pid = fork();
+			if(pid < 0) {
+				perror("Fork failed");
+			}
+			if(pid == 0) {
+				// Do the action associated with the corresponding midi note
+				execl("/bin/sh", "sh", "-c", it->second[0].c_str(), NULL);
+				_exit(0);
+			}
+			// Clean up zombie children.
+			// TODO: find way to ensure there are never zombie children
+			waitpid(-1, 0, WNOHANG);
 
 			// Led handling
 			if(it->second.size() >= 2) {

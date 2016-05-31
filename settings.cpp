@@ -60,7 +60,6 @@ void config::read() {
 				std::vector<std::string> entry_list;
 				ss.clear();
 				ss.str(value);
-
 				while(getline(ss, temp, delim))
 					entry_list.push_back(trim(temp));
 
@@ -105,7 +104,6 @@ bool Note::contains(const std::vector<unsigned char>& note) const {
 	return true;
 }
 
-//bool Note::operator<(const Note& n1, const Note& n2) const {
 bool Note::operator<(const Note& other) const {
 	for(int i = 0; i < 3; ++i) {
 		if(min[i] < other.min[i] && max[i] < other.max[i])
