@@ -1,0 +1,6 @@
+doc/*
+test/*
+TODO
+key
+makefile
+!.gitignore
