@@ -98,7 +98,8 @@ cleanup:
 void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
 	for (auto it = settings.note_list.begin(); it != settings.note_list.end(); ++it) {
 		if(it->first.contains(*note_raw)) {
-			
+			// Ensure all children are reaped
+			signal(SIGCHLD, SIG_IGN);
 			// Fork for command to be run
 			pid_t pid = fork();
 			if(pid < 0) {
@@ -109,24 +110,47 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 				execl("/bin/sh", "sh", "-c", it->second[0].c_str(), NULL);
 				_exit(0);
 			}
-			// Clean up zombie children.
-			// TODO: find way to ensure there are never zombie children
-			waitpid(-1, 0, WNOHANG);
 
 			// Led handling
 			if(it->second.size() >= 2) {
 				std::vector<unsigned char> message;
+				// light_on
 				if(it->second[1] == "light_on") {
 					message.push_back(144);
 					message.push_back((int)note_raw->at(1));
 					message.push_back(stoi(it->second[2]));
+					midiout->sendMessage(&message);
 				}
+				// light_off
 				if(it->second[1] == "light_off") {
 					message.push_back(144);
 					message.push_back((int)note_raw->at(1));
 					message.push_back(0);
+					midiout->sendMessage(&message);
 				}
-				midiout->sendMessage(&message);
+				// light_wait
+				if(it->second[1] == "light_wait") {
+					message.push_back(144);
+					message.push_back((int)note_raw->at(1));
+					message.push_back(stoi(it->second[2]));
+					midiout->sendMessage(&message);
+
+					pid_t pid_light = fork();
+					if(pid_light < 0) {
+						perror("Fork failed");
+					}
+					if(pid_light == 0) {
+						// Wait for action to finish
+						while(kill(pid, 0) == 0) {
+							usleep(10000);
+						}
+						// Turn off led
+						message.pop_back();
+						message.push_back(0);
+						midiout->sendMessage(&message);
+						_exit(0);
+					}
+				}
 			}
 		}
 	}

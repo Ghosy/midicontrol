@@ -2,8 +2,6 @@
 #include <fstream>
 #include <sstream>
 
-//#include <iostream>
-
 #include "settings.h"
 
 config settings;

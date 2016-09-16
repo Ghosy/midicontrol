@@ -14,12 +14,17 @@ device = Launchpad
 	144,19,127 = mpc -q clear && mpc -q load Transistor\ OST >> /dev/null
 	144,20,127 = mpc -q clear && mpc -q load Stan\ SB >> /dev/null
 	144,21,127 = mpc -q clear && mpc -q load PPPPPP >> /dev/null
-	144,22,127 = mpc -q clear && mpc -q load Everfree\ Radio >> /dev/null
+	144,22,127 = mpc -q clear && mpc -q load A\ Prague\ Spring >> /dev/null
 	144,23,127 = mpc -q clear && mpc -q load VPR >> /dev/null
 	144,24,127 = mpc -q clear
-	144,32,127 = ~/projects/soundboard/soundboard.sh -o -f ~/projects/soundboard/clips/AIRPORN.wav
-	144,33,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/MyMistakes.wav
-	144,34,127 = ~/projects/soundboard/soundboard.sh -f ~/projects/soundboard/clips/SadAirhorn.wav
+	144,32,127 = ~/projects/soundboard/soundboard.sh -o -f ~/projects/soundboard/clips/AIRPORN.wav, light_wait, 60
+	144,33,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/MyMistakes.wav, light_wait, 60
+	144,34,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/SadAirhorn.wav, light_wait, 60
+	144,35,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/MontyPythonIntermission.wav, light_wait, 60
+	144,36,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/YouGetNothing.wav, light_wait, 60
+	144,39,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/JeopardyTheme.wav, light_wait, 60
+	144,48,127 = echo "clientupdate client_input_muted=1" | nc localhost 25639 >> /dev/null
+	144,49,127 = echo "clientupdate client_input_muted=0" | nc localhost 25639 >> /dev/null
 	144,96,127 = xdotool key --clearmodifiers "alt+e"
 	144,97,127 = xdotool key --clearmodifiers "alt+o"
 	144,112,127 = xdotool keydown --clearmodifiers "alt+KP_1"
