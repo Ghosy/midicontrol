@@ -135,6 +135,7 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 					message.push_back(stoi(it->second[2]));
 					midiout->sendMessage(&message);
 
+					// Fork and wait for child executing command to exit
 					pid_t pid_light = fork();
 					if(pid_light < 0) {
 						perror("Fork failed");
