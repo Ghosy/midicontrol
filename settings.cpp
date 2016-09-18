@@ -122,6 +122,8 @@ Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, 
 		max[i] = highs[i];
 	}
 	action = new_action;
+	light_mode = LightMode::NONE;
+	light_value = 0;
 }
 
 Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value) {
