@@ -109,3 +109,4 @@ bool Note::operator<(const Note& other) const {
 	}
 	return false;
 }
+

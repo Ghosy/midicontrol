@@ -3,6 +3,12 @@
 
 #include <map>
 
+enum class light_mode {
+	LIGHT_ON,
+	LIGHT_OFF,
+	LIGHT_WAIT
+};
+
 class Note
 {
 	public:
