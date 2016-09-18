@@ -118,7 +118,8 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 			std::vector<unsigned char> message;
 			
 			switch(it->light_mode) {
-				case LightMode::LIGHT_ON: {
+				case LightMode::LIGHT_ON:
+				case LightMode::LIGHT_PUSH: {
 					message.push_back(144);
 					message.push_back((int)note_raw->at(1));
 					message.push_back(it->light_value);

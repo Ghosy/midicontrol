@@ -5,6 +5,7 @@
 
 enum class LightMode {
 	NONE,
+	LIGHT_PUSH,
 	LIGHT_ON,
 	LIGHT_OFF,
 	LIGHT_WAIT
@@ -22,7 +23,6 @@ class Entry
 		std::string action;
 		LightMode light_mode;
 		unsigned char light_value;
-	private:
 		unsigned char min[3];
 		unsigned char max[3];
 };
