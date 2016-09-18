@@ -59,7 +59,7 @@ void scan_ports() {
 		exit(EXIT_FAILURE);
 	}
 	std::vector<unsigned char> message;
-	
+
 	// Check available ports.
 	unsigned int nPorts = midiin->getPortCount();
 	if(nPorts == 0) {
@@ -70,7 +70,7 @@ void scan_ports() {
 	for(unsigned int i = 0; i < nPorts; i++) {
 		std::string s = midiin->getPortName(i);
 		s = s.substr(0, s.find_last_of(' '));
-		
+
 		if(s == settings.getDevice()) {
 			midiin->openPort(i);
 			midiout->openPort(i);
@@ -96,45 +96,48 @@ cleanup:
 }
 
 void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
-	for (auto it = settings.note_list.begin(); it != settings.note_list.end(); ++it) {
-		if(it->first.contains(*note_raw)) {
-			// Ensure all children are reaped
-			signal(SIGCHLD, SIG_IGN);
-			// Fork for command to be run
-			pid_t pid = fork();
-			if(pid < 0) {
-				perror("Fork failed");
-			}
-			if(pid == 0) {
-				// Do the action associated with the corresponding midi note
-				execl("/bin/sh", "sh", "-c", it->second[0].c_str(), NULL);
-				_exit(0);
-			}
+	Entry temp_entry(*note_raw, *note_raw, "");
+	auto it = settings.note_list.find(temp_entry);
+	
+	if(it != settings.note_list.end()) {
+		// Ensure all children are reaped
+		signal(SIGCHLD, SIG_IGN);
+		// Fork for command to be run
+		pid_t pid = fork();
+		if(pid < 0) {
+			perror("Fork failed");
+		}
+		if(pid == 0) {
+			// Do the action associated with the corresponding midi note
+			execl("/bin/sh", "sh", "-c", it->action.c_str(), NULL);
+			_exit(0);
+		}
 
-			// Led handling
-			if(it->second.size() >= 2) {
-				std::vector<unsigned char> message;
-				// light_on
-				if(it->second[1] == "light_on") {
+		// Led handling
+		if(it->light_mode != LightMode::NONE) {
+			std::vector<unsigned char> message;
+			
+			switch(it->light_mode) {
+				case LightMode::LIGHT_ON: {
 					message.push_back(144);
 					message.push_back((int)note_raw->at(1));
-					message.push_back(stoi(it->second[2]));
+					message.push_back(it->light_value);
 					midiout->sendMessage(&message);
+					break;
 				}
-				// light_off
-				if(it->second[1] == "light_off") {
+				case LightMode::LIGHT_OFF: {
 					message.push_back(144);
 					message.push_back((int)note_raw->at(1));
 					message.push_back(0);
 					midiout->sendMessage(&message);
+					break;
 				}
-				// light_wait
-				if(it->second[1] == "light_wait") {
+				case LightMode::LIGHT_WAIT: {
 					message.push_back(144);
 					message.push_back((int)note_raw->at(1));
-					message.push_back(stoi(it->second[2]));
+					message.push_back(it->light_value);
 					midiout->sendMessage(&message);
-
+					
 					// Fork and wait for child executing command to exit
 					pid_t pid_light = fork();
 					if(pid_light < 0) {
@@ -151,6 +154,12 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 						midiout->sendMessage(&message);
 						_exit(0);
 					}
+					break;
+				}
+				default: {
+					// Print error non conforming light_mode
+					// TODO: Add debug code
+					break;
 				}
 			}
 		}
@@ -160,11 +169,11 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 void show_usage() {
 	// Prints usage/help information
 	std::cout 
-	<< "Usage: placeholder [OPTION]...\n"
-	<< "  -h, --help      show this help message\n"
-	<< "  -l, --list      list midi input/output ports\n"
-	<< "  -c, --config    Load alternate configuration file\n"
-	;
+		<< "Usage: placeholder [OPTION]...\n"
+		<< "  -h, --help      show this help message\n"
+		<< "  -l, --list      list midi input/output ports\n"
+		<< "  -c, --config    Load alternate configuration file\n"
+		;
 }
 
 void list_ports() {

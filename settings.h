@@ -1,21 +1,27 @@
 #ifndef SETTINGS_H_
 #define SETTINGS_H_
 
-#include <map>
+#include <set>
 
-enum class light_mode {
+enum class LightMode {
+	NONE,
 	LIGHT_ON,
 	LIGHT_OFF,
 	LIGHT_WAIT
 };
 
-class Note
+class Entry
 {
 	public:
-		Note();
-		Note(std::vector<unsigned char> lows, std::vector<unsigned char> highs);
+		Entry();
+		Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action);
+		Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value);
 		bool contains(const std::vector<unsigned char>& note) const;
-		bool operator<(const Note& other) const;
+		bool operator<(const Entry& other) const;
+		
+		std::string action;
+		LightMode light_mode;
+		unsigned char light_value;
 	private:
 		unsigned char min[3];
 		unsigned char max[3];
@@ -26,7 +32,7 @@ struct config {
 	
 	void read();
 	void commandline_config(const char*);
-	std::map<Note, std::vector<std::string> > note_list;
+	std::set<Entry> note_list;
 	std::string getDevice();
 
 private:
