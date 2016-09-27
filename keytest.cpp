@@ -159,8 +159,7 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 				}
 				default: {
 					// Print error non conforming light_mode
-					// TODO: Make more verbose
-					std::cerr << "Non-conforming light_mode found in note detected" << std::endl;
+					std::cerr << "Non-conforming light_mode found for note, " << it->get_note() << std::endl;
 					break;
 				}
 			}
