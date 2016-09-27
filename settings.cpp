@@ -72,7 +72,7 @@ void config::read() {
 						new_mode = LightMode::LIGHT_PUSH;
 						new_light_value = stoi(entry_list[2]);
 					}
-					if(entry_list[1] == "light_on") {
+					else if(entry_list[1] == "light_on") {
 						new_mode = LightMode::LIGHT_ON;
 						new_light_value = stoi(entry_list[2]);
 					}
@@ -86,8 +86,9 @@ void config::read() {
 					}
 					else {
 						// Print error light_mode not valid
-						// TODO: Make more verbose
-						std::cerr << "light_mode set is invalid" << std::endl;
+						new_entry = Entry(lows, highs, entry_list[0]);
+						std::cerr << entry_list[1] << " is not a valid value for light_mode" << std::endl;
+						std::cerr << "light_mode is invalid for " << new_entry.get_note() << std::endl;
 					}
 					
 					new_entry = Entry(lows, highs, entry_list[0], new_mode, new_light_value);
