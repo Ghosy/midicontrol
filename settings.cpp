@@ -35,47 +35,16 @@ void config::read() {
 			else {
 				std::string temp;
 				char delim = ',';
-
-				// Break up note and place into vector
-				std::vector<unsigned char> lows;
-				std::vector<unsigned char> highs;
-				std::stringstream ss(name);
-
-				while(getline(ss, temp, delim)) {
-					int breakpos = temp.find("..");
-					// If string contains ".."
-					if(breakpos != -1) {
-						int low = stoi(temp.substr(0, breakpos));
-						int high = stoi(temp.substr(breakpos + 2));
-						std::cout << low << " " << high << std::endl;
-						// Check for invalid values
-						if(low > 255 || low < 0) {
-							std::cerr << low << " is not a valid value for a note" << std::endl;
-						}
-						if( high > 255 || high < 0) {
-							std::cerr << high << " is not a valid value for a note" << std::endl;
-						}
-						
-						lows.push_back((unsigned char)low);
-						highs.push_back((unsigned char)high);
-					}
-					// If string doesn't contain ".."
-					else {
-						int val = stoi(temp);
-						// Check for invalid value
-						if(val > 255 || val < 0) {
-							std::cerr << val << " is not a valid value for a note" << std::endl;
-						}
-						
-						lows.push_back((unsigned char)val);
-						highs.push_back((unsigned char)val);
-					}
-				}
 				
+				// Break up note and place into vectors
+				auto vals = config::read_note(name);
+				std::vector<unsigned char> lows = vals.first;
+				std::vector<unsigned char> highs = vals.second;
+				
+				//TODO: Break this section into seperate function for readability
 				// Break up after =
 				std::vector<std::string> entry_list;
-				ss.clear();
-				ss.str(value);
+				std::stringstream ss(value);
 				while(getline(ss, temp, delim))
 					entry_list.push_back(trim(temp));
 				
@@ -192,6 +161,44 @@ std::string config::trim(std::string s) {
 	size_t endpos = s.find_last_not_of(" \n\r\t");
 	s = s.substr(0, endpos + 1);
 	return s;
+}
+std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_note(const std::string note) {
+	std::vector<unsigned char> lows;
+	std::vector<unsigned char> highs;
+	std::string temp;
+	char delim = ',';
+	std::stringstream ss(note);
+
+	while(getline(ss, temp, delim)) {
+		int breakpos = temp.find("..");
+		// If string contains ".."
+		if(breakpos != -1) {
+			int low = stoi(temp.substr(0, breakpos));
+			int high = stoi(temp.substr(breakpos + 2));
+			// Check for invalid values
+			if(low > 255 || low < 0) {
+				std::cerr << low << " is not a valid value for a note" << std::endl;
+			}
+			if( high > 255 || high < 0) {
+				std::cerr << high << " is not a valid value for a note" << std::endl;
+			}
+
+			lows.push_back((unsigned char)low);
+			highs.push_back((unsigned char)high);
+		}
+		// If string doesn't contain ".."
+		else {
+			int val = stoi(temp);
+			// Check for invalid value
+			if(val > 255 || val < 0) {
+				std::cerr << val << " is not a valid value for a note" << std::endl;
+			}
+
+			lows.push_back((unsigned char)val);
+			highs.push_back((unsigned char)val);
+		}
+	}
+	return make_pair(lows, highs);
 }
 
 Entry::Entry() {

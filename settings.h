@@ -2,6 +2,7 @@
 #define SETTINGS_H_
 
 #include <set>
+#include <utility>
 
 enum class LightMode {
 	NONE,
@@ -40,6 +41,7 @@ private:
 	std::string config_file_path;
 	std::string midi_device;
 	std::string trim(std::string);
+	std::pair<std::vector<unsigned char>, std::vector<unsigned char>> read_note(const std::string);
 };
 
 extern config settings;
