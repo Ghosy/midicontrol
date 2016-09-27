@@ -1,4 +1,4 @@
-#include <iosfwd>
+#include <iostream>
 #include <signal.h>
 #include <unistd.h>
 #include <sys/wait.h>
@@ -159,7 +159,8 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 				}
 				default: {
 					// Print error non conforming light_mode
-					// TODO: Add debug code
+					// TODO: Make more verbose
+					std::cerr << "Non-conforming light_mode found in note detected" << std::endl;
 					break;
 				}
 			}

@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -85,7 +86,8 @@ void config::read() {
 					}
 					else {
 						// Print error light_mode not valid
-						// TODO: Add error code
+						// TODO: Make more verbose
+						std::cerr << "light_mode set is invalid" << std::endl;
 					}
 					
 					new_entry = Entry(lows, highs, entry_list[0], new_mode, new_light_value);
@@ -139,7 +141,8 @@ void config::read() {
 						else {
 							// Print error light_mode used incorrectly
 							// Use light_on instead of light_push
-							// TODO: Add error code
+							// TODO: Make more verbose
+							std::cerr << "Light_mode set incorrectly, don't use a light_mode on note off of note using light_push" << std::endl;
 						}
 						
 						next_ready = j + 1;
