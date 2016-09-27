@@ -45,15 +45,33 @@ void config::read() {
 					int breakpos = temp.find("..");
 					// If string contains ".."
 					if(breakpos != -1) {
-						lows.push_back((unsigned char)stoi(temp.substr(0, breakpos)));
-						highs.push_back((unsigned char)stoi(temp.substr(breakpos + 2)));
+						int low = stoi(temp.substr(0, breakpos));
+						int high = stoi(temp.substr(breakpos + 2));
+						std::cout << low << " " << high << std::endl;
+						// Check for invalid values
+						if(low > 255 || low < 0) {
+							std::cerr << low << " is not a valid value for a note" << std::endl;
+						}
+						if( high > 255 || high < 0) {
+							std::cerr << high << " is not a valid value for a note" << std::endl;
+						}
+						
+						lows.push_back((unsigned char)low);
+						highs.push_back((unsigned char)high);
 					}
 					// If string doesn't contain ".."
 					else {
-						lows.push_back((unsigned char)stoi(temp));
-						highs.push_back((unsigned char)stoi(temp));
+						int val = stoi(temp);
+						// Check for invalid value
+						if(val > 255 || val < 0) {
+							std::cerr << val << " is not a valid value for a note" << std::endl;
+						}
+						
+						lows.push_back((unsigned char)val);
+						highs.push_back((unsigned char)val);
 					}
 				}
+				
 				// Break up after =
 				std::vector<std::string> entry_list;
 				ss.clear();
@@ -86,9 +104,9 @@ void config::read() {
 					}
 					else {
 						// Print error light_mode not valid
-						new_entry = Entry(lows, highs, entry_list[0]);
+						Entry err_entry(lows, highs, "");
 						std::cerr << entry_list[1] << " is not a valid value for light_mode" << std::endl;
-						std::cerr << "light_mode is invalid for " << new_entry.get_note() << std::endl;
+						std::cerr << "light_mode is invalid for " << err_entry.get_note() << std::endl;
 					}
 					
 					new_entry = Entry(lows, highs, entry_list[0], new_mode, new_light_value);
