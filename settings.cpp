@@ -119,7 +119,7 @@ void config::read() {
 						// Create entry for LIGHT_OFF for range before found
 						if(next_ready < j) {
 							std::vector<unsigned char> low{i, next_ready, 0};
-							// TODO: Static cast is done here to avoid warkning. Is there a better way?
+							// TODO: Static cast is done here to avoid warning. Is there a better way?
 							std::vector<unsigned char> high{i, static_cast<unsigned char>(j - 1), 0};
 							Entry new_entry(low, high, "exec", LightMode::LIGHT_OFF, 0);
 							note_list.insert(new_entry);
@@ -213,4 +213,21 @@ bool Entry::operator<(const Entry& other) const {
 			return true;
 	}
 	return false;
+}
+
+std::string Entry::get_note() const {
+	std::ostringstream ostream;
+	
+	for(int i = 0; i < 3; ++i) {
+		if(min[i] == max[i]) {
+			ostream << (int)min[i];
+		}
+		else {
+			ostream << (int)min[i] << ".." << (int)max[i];
+		}
+		if(i < 2) {
+			ostream << ",";
+		}
+	}
+	return ostream.str();
 }

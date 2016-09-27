@@ -19,6 +19,7 @@ class Entry
 		Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value);
 		bool contains(const std::vector<unsigned char>& note) const;
 		bool operator<(const Entry& other) const;
+		std::string get_note() const;
 		
 		std::string action;
 		LightMode light_mode;
