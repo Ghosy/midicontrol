@@ -122,8 +122,7 @@ void config::read() {
 							std::vector<unsigned char> low{i, next_ready, 0};
 							// TODO: Static cast is done here to avoid warning. Is there a better way?
 							std::vector<unsigned char> high{i, static_cast<unsigned char>(j - 1), 0};
-							// TODO: Does this need exec here or can I provide nothing?
-							Entry new_entry(low, high, "exec", LightMode::LIGHT_OFF, 0);
+							Entry new_entry(low, high, "", LightMode::LIGHT_OFF, 0);
 							note_list.insert(new_entry);
 						}
 						// Modify entry for found
@@ -154,7 +153,7 @@ void config::read() {
 				if(next_ready == it->min[1]) {
 					std::vector<unsigned char> low{i, next_ready, 0};
 					std::vector<unsigned char> high{i, it->max[1], 0};
-					Entry new_entry(low, high, "exec", LightMode::LIGHT_OFF, 0);
+					Entry new_entry(low, high, "", LightMode::LIGHT_OFF, 0);
 					note_list.insert(new_entry);
 				}
 			}
