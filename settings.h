@@ -25,6 +25,7 @@ class Entry
 		std::string action;
 		LightMode light_mode;
 		unsigned char light_value;
+		// TODO: Should this really be stored as array or use more useful storage
 		unsigned char min[3];
 		unsigned char max[3];
 };

@@ -41,7 +41,7 @@ void config::read() {
 				std::vector<unsigned char> lows = vals.first;
 				std::vector<unsigned char> highs = vals.second;
 				
-				//TODO: Break this section into seperate function for readability
+				//TODO: Break this section into separate function for readability
 				// Break up after =
 				std::vector<std::string> entry_list;
 				std::stringstream ss(value);

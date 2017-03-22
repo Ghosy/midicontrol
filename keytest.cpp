@@ -16,12 +16,12 @@ bool done;
 static void finish(int ignore){ done = true; }
 
 int main(int argc, char* argv[]) {
-	// If no arguements
+	// If no arguments
 	if(argc == 1) {
 		scan_ports();
 		return 0;
 	}
-	// Cases for all arguements
+	// Cases for all arguments
 	for(int i = 1; i < argc; ++i) {
 		std::string arg = argv[i];
 		if((arg == "-h") || (arg == "--help")) {
@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 				std::cout << "No Config file was specified." << std::endl;
 			}
 		}
-		// If the arguement is not supported show_usage
+		// If the argument is not supported show_usage
 		else {
 			show_usage();
 		}
