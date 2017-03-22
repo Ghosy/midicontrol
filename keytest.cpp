@@ -120,7 +120,7 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 	if(prog_settings::verbose) {
 		std::cout << "Incoming note: " << temp_entry.get_note() << std::endl;
 	}
-	
+
 	// If note is found in look up table
 	if(it != settings.note_list.end()) {
 		// Ensure all children are reaped
@@ -146,7 +146,7 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 		// Led handling
 		if(it->light_mode != LightMode::NONE) {
 			std::vector<unsigned char> message;
-			
+
 			switch(it->light_mode) {
 				case LightMode::LIGHT_ON:
 				case LightMode::LIGHT_PUSH: {
@@ -168,7 +168,7 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 					message.push_back((int)note_raw->at(1));
 					message.push_back(it->light_value);
 					midiout->sendMessage(&message);
-					
+
 					// Fork and wait for child executing command to exit
 					pid_t pid_light = fork();
 					if(pid_light < 0) {

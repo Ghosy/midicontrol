@@ -21,7 +21,7 @@ class Entry
 		bool contains(const std::vector<unsigned char>& note) const;
 		bool operator<(const Entry& other) const;
 		std::string get_note() const;
-		
+
 		std::string action;
 		LightMode light_mode;
 		unsigned char light_value;
@@ -32,7 +32,7 @@ class Entry
 
 struct config {
 	config();
-	
+
 	void read();
 	void commandline_config(const char*);
 	std::set<Entry> note_list;

@@ -18,10 +18,10 @@ void config::read() {
 	}
 	std::ifstream f(config_file_path.c_str());
 	std::string cline, name, value;
-	
+
 	if(!f.is_open())
 		return;
-	
+
 	while(!f.eof()) {
 		getline(f, cline);
 
@@ -38,25 +38,25 @@ void config::read() {
 			else {
 				std::string temp;
 				char delim = ',';
-				
+
 				// Break up note and place into vectors
 				auto vals = config::read_note(name);
 				std::vector<unsigned char> lows = vals.first;
 				std::vector<unsigned char> highs = vals.second;
-				
+
 				//TODO: Break this section into separate function for readability
 				// Break up after =
 				std::vector<std::string> entry_list;
 				std::stringstream ss(value);
 				while(getline(ss, temp, delim))
 					entry_list.push_back(trim(temp));
-				
+
 				Entry new_entry;
 				// If there are light settings
 				if(entry_list.size() >= 2) {
 					LightMode new_mode;
 					unsigned char new_light_value;
-					
+
 					// TODO: Program wraps to 255 value, but should this not add light data to entry?
 					// Warn if light value not in range
 					int light_val = stoi(entry_list[2]);
@@ -90,19 +90,19 @@ void config::read() {
 							std::cerr << "light_mode is invalid for " << err_entry.get_note() << std::endl;
 						}
 					}
-					
+
 					new_entry = Entry(lows, highs, entry_list[0], new_mode, new_light_value);
 				}
 				else {
 					new_entry = Entry(lows, highs, entry_list[0]);
 				}
-				
+
 				// Store entry
 				note_list.insert(new_entry);
 			}
 		}
 	}
-	
+
 	// Look through all entries for LIGHT_PUSH missing LIGHT_OFF
 	// TODO: Try and clean this up. It's a mess
 	for(auto it = note_list.begin(); it != note_list.end(); ++it) {
@@ -115,7 +115,7 @@ void config::read() {
 				for(unsigned char j = it->min[1]; j <= it->max[1]; ++j) {
 					Entry temp_entry({i,j,0}, {i,j,0}, "");
 					std::set<Entry>::iterator it_find = settings.note_list.find(temp_entry);
-					
+
 					if(it_find != settings.note_list.end()) {
 						// Create entry for LIGHT_OFF for range before found
 						if(next_ready < j) {
@@ -146,7 +146,7 @@ void config::read() {
 							if(prog_settings::silent)
 								std::cerr << "Light_mode set incorrectly, don't use a light_mode on note off of note using light_push" << std::endl;
 						}
-						
+
 						next_ready = j + 1;
 					}
 				}
@@ -176,6 +176,7 @@ std::string config::trim(std::string s) {
 	s = s.substr(0, endpos + 1);
 	return s;
 }
+
 std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_note(const std::string note) {
 	std::vector<unsigned char> lows;
 	std::vector<unsigned char> highs;
@@ -238,7 +239,7 @@ Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, 
 		min[i] = lows[i];
 		max[i] = highs[i];
 	}
-	
+
 	action = new_action;
 	light_mode = new_mode;
 	light_value = new_light_value;
@@ -262,7 +263,7 @@ bool Entry::operator<(const Entry& other) const {
 
 std::string Entry::get_note() const {
 	std::ostringstream ostream;
-	
+
 	for(int i = 0; i < 3; ++i) {
 		if(min[i] == max[i]) {
 			ostream << (int)min[i];
