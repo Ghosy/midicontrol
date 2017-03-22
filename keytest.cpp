@@ -202,14 +202,14 @@ void show_usage() {
 	// Prints usage/help information
 	std::cout 
 		<< "Usage: placeholder [OPTION]...\n"
-		<< "  -c, --config     Load alternate configuration file\n"
-		<< "  -h, --help       Show this help message\n"
-		<< "  -i, --input      Print specified midi device's incoming input\n"
-		<< "  -l, --list       List midi input/output ports\n"
-		<< "  -q, --quiet      Supress normal output when reading midi input\n"
-		<< "  -s, --silent     Supress normal output and suppress errors\n"
-		<< "  -v, --verbose    Print extra information during reading input\n"
-		<< "                     --quiet and --silent override --verbose\n"
+		<< "  -c, --config=FILE     Load alternate configuration file\n"
+		<< "  -h, --help            Show this help message\n"
+		<< "  -i, --input=DEVICE    Print specified midi device's incoming input\n"
+		<< "  -l, --list            List midi input/output ports\n"
+		<< "  -q, --quiet           Supress normal output when reading midi input\n"
+		<< "  -s, --silent          Supress normal output and suppress errors\n"
+		<< "  -v, --verbose         Print extra information during reading input\n"
+		<< "                          --quiet and --silent override --verbose\n"
 		;
 }
 
