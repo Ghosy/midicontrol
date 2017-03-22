@@ -257,3 +257,9 @@ std::string Entry::get_note() const {
 	}
 	return ostream.str();
 }
+
+// I swear to god if these names aren't fix to be
+// less confusing soon, someone will get hurt.
+namespace prog_settings {
+	bool quiet = false;
+}

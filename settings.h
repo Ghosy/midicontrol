@@ -47,4 +47,10 @@ private:
 
 extern config settings;
 
+// I swear to god if these names aren't fix to be
+// less confusing soon, someone will get hurt.
+namespace prog_settings {
+	extern bool quiet;
+}
+
 #endif

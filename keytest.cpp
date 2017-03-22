@@ -1,3 +1,4 @@
+#include <fcntl.h>
 #include <iostream>
 #include <signal.h>
 #include <unistd.h>
@@ -16,36 +17,37 @@ bool done;
 static void finish(int ignore){ done = true; }
 
 int main(int argc, char* argv[]) {
-	// If no arguments
-	if(argc == 1) {
-		scan_ports();
-		return 0;
-	}
 	// Cases for all arguments
 	for(int i = 1; i < argc; ++i) {
 		std::string arg = argv[i];
 		if((arg == "-h") || (arg == "--help")) {
 			show_usage();
+			return 0;
 		}
 		else if((arg == "-l") || (arg == "--list")) {
 			list_ports();
+			return 0;
 		}
 		else if((arg == "-c") || (arg == "--config")) {
 			if(++i <= argc) {
 				// This should be integrated before this check area
 				settings.commandline_config(argv[i]);
-				scan_ports();
 			}
 			else {
 				std::cout << "No Config file was specified." << std::endl;
 			}
 		}
+		else if((arg == "-q") || (arg == "--quiet")) {
+			prog_settings::quiet = true;
+		}
 		// If the argument is not supported show_usage
 		else {
 			show_usage();
+			return 0;
 		}
-		return 0;
 	}
+	scan_ports();
+	return 0;
 }
 
 void scan_ports() {
@@ -85,7 +87,8 @@ void scan_ports() {
 	// Install an interrupt handler function.
 	done = false;
 	(void) signal(SIGINT, finish);
-	std::cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
+	if(!prog_settings::quiet)
+		std::cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
 	while(!done) {
 		usleep(10000);
 	}
@@ -108,6 +111,10 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 			perror("Fork failed");
 		}
 		if(pid == 0) {
+			if(prog_settings::quiet) {
+				int fd = open("/dev/null", O_WRONLY);
+				dup2(fd, 1);
+			}
 			// Do the action associated with the corresponding midi note
 			execl("/bin/sh", "sh", "-c", it->action.c_str(), NULL);
 			_exit(0);
@@ -174,6 +181,7 @@ void show_usage() {
 		<< "  -h, --help      show this help message\n"
 		<< "  -l, --list      list midi input/output ports\n"
 		<< "  -c, --config    Load alternate configuration file\n"
+		<< "  -q, --quiet     Supress output when reading midi input\n"
 		;
 }
 
