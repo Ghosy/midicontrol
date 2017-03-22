@@ -21,17 +21,26 @@ int main(int argc, char* argv[]) {
 	for(int i = 1; i < argc; ++i) {
 		std::string arg = argv[i];
 		if((arg == "-c") || (arg == "--config")) {
-			if(++i <= argc) {
+			if(++i < argc) {
 				// This should be integrated before this check area
 				settings.commandline_config(argv[i]);
 			}
 			else {
-				std::cout << "No Config file was specified." << std::endl;
+				std::cerr << "No Config file was specified." << std::endl;
 			}
 		}
 		else if((arg == "-h") || (arg == "--help")) {
 			show_usage();
 			return 0;
+		}
+		else if((arg == "-i") || (arg == "--input")) {
+			if(++i < argc) {
+				input_scan(argv[i]);
+				return 0;
+			}
+			else {
+				std::cerr << "No input device was specified." << std::endl;
+			}
 		}
 		else if((arg == "-l") || (arg == "--list")) {
 			list_ports();
@@ -195,6 +204,7 @@ void show_usage() {
 		<< "Usage: placeholder [OPTION]...\n"
 		<< "  -c, --config     Load alternate configuration file\n"
 		<< "  -h, --help       Show this help message\n"
+		<< "  -i, --input      Print specified midi device's incoming input\n"
 		<< "  -l, --list       List midi input/output ports\n"
 		<< "  -q, --quiet      Supress normal output when reading midi input\n"
 		<< "  -s, --silent     Supress normal output and suppress errors\n"
@@ -226,7 +236,7 @@ void list_ports() {
 			error.printMessage();
 			goto cleanup;
 		}
-		std::cout << "  Input Port #" << i << ": " << portName << '\n';
+		std::cout << "  Input Port #" << i << ": " << portName << std::endl;
 	}
 	// RtMidiOut constructor
 	try {
@@ -247,11 +257,61 @@ void list_ports() {
 			error.printMessage();
 			goto cleanup;
 		}
-		std::cout << "  Output Port #" << i << ": " << portName << '\n';
+		std::cout << "  Output Port #" << i << ": " << portName << std::endl;
 	}
-	std::cout << '\n';
+	std::cout << std::endl;
 	// Clean up
 cleanup:
 	delete midiin;
 	delete midiout;
+}
+
+void input_scan(std::string device) {
+	RtMidiIn  *midiin = 0;
+
+	try {
+		midiin = new RtMidiIn();
+	}
+	catch (RtMidiError &error) {
+		error.printMessage();
+		exit(EXIT_FAILURE);
+	}
+	std::vector<unsigned char> message;
+
+	// Check available ports.
+	unsigned int nPorts = midiin->getPortCount();
+	if(nPorts == 0) {
+		std::cout << "No ports available!\n";
+		goto cleanup;
+	}
+	// Go threw ports and open the configured device
+	for(unsigned int i = 0; i < nPorts; i++) {
+		std::string s = midiin->getPortName(i);
+		s = s.substr(0, s.find_last_of(' '));
+
+		if(s == device) {
+			midiin->openPort(i);
+		}
+	}
+	// Set callback function
+	// Make sure this always follows opening of port
+	// to prevent messages ending up in queue
+	midiin->setCallback(&input_read);
+	// Don't ignore sysex, timing, or active sensing messages.
+	midiin->ignoreTypes(false, false, false);
+	// Install an interrupt handler function.
+	done = false;
+	(void) signal(SIGINT, finish);
+	std::cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
+	while(!done) {
+		usleep(10000);
+	}
+	// Clean up
+cleanup:
+	delete midiin;
+}
+
+void input_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
+	Entry temp_entry(*note_raw, *note_raw, "");
+	std::cout << "Note: " << temp_entry.get_note() << std::endl;
 }
