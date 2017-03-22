@@ -74,8 +74,10 @@ void config::read() {
 					else {
 						// Print error light_mode not valid
 						Entry err_entry(lows, highs, "");
-						std::cerr << entry_list[1] << " is not a valid value for light_mode" << std::endl;
-						std::cerr << "light_mode is invalid for " << err_entry.get_note() << std::endl;
+						if(!prog_settings::silent) {
+							std::cerr << entry_list[1] << " is not a valid value for light_mode" << std::endl;
+							std::cerr << "light_mode is invalid for " << err_entry.get_note() << std::endl;
+						}
 					}
 					
 					new_entry = Entry(lows, highs, entry_list[0], new_mode, new_light_value);
@@ -130,7 +132,8 @@ void config::read() {
 							// Print error light_mode used incorrectly
 							// Use light_on instead of light_push
 							// TODO: Make more verbose
-							std::cerr << "Light_mode set incorrectly, don't use a light_mode on note off of note using light_push" << std::endl;
+							if(prog_settings::silent)
+								std::cerr << "Light_mode set incorrectly, don't use a light_mode on note off of note using light_push" << std::endl;
 						}
 						
 						next_ready = j + 1;
@@ -175,12 +178,15 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 		if(breakpos != -1) {
 			int low = stoi(temp.substr(0, breakpos));
 			int high = stoi(temp.substr(breakpos + 2));
-			// Check for invalid values
-			if(low > 255 || low < 0) {
-				std::cerr << low << " is not a valid value for a note" << std::endl;
-			}
-			if( high > 255 || high < 0) {
-				std::cerr << high << " is not a valid value for a note" << std::endl;
+
+			if(prog_settings::silent) {
+				// Check for invalid values
+				if(low > 255 || low < 0) {
+					std::cerr << low << " is not a valid value for a note" << std::endl;
+				}
+				if( high > 255 || high < 0) {
+					std::cerr << high << " is not a valid value for a note" << std::endl;
+				}
 			}
 
 			lows.push_back((unsigned char)low);
@@ -189,9 +195,11 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 		// If string doesn't contain ".."
 		else {
 			int val = stoi(temp);
-			// Check for invalid value
-			if(val > 255 || val < 0) {
-				std::cerr << val << " is not a valid value for a note" << std::endl;
+			if(prog_settings::silent) {
+				// Check for invalid value
+				if(val > 255 || val < 0) {
+					std::cerr << val << " is not a valid value for a note" << std::endl;
+				}
 			}
 
 			lows.push_back((unsigned char)val);
@@ -262,4 +270,5 @@ std::string Entry::get_note() const {
 // less confusing soon, someone will get hurt.
 namespace prog_settings {
 	bool quiet = false;
+	bool silent = false;
 }

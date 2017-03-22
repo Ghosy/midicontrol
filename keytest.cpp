@@ -40,6 +40,9 @@ int main(int argc, char* argv[]) {
 		else if((arg == "-q") || (arg == "--quiet")) {
 			prog_settings::quiet = true;
 		}
+		else if((arg == "-s") || (arg == "--silent")) {
+			prog_settings::silent = true;
+		}
 		// If the argument is not supported show_usage
 		else {
 			show_usage();
@@ -87,7 +90,7 @@ void scan_ports() {
 	// Install an interrupt handler function.
 	done = false;
 	(void) signal(SIGINT, finish);
-	if(!prog_settings::quiet)
+	if(!prog_settings::quiet && !prog_settings::silent)
 		std::cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
 	while(!done) {
 		usleep(10000);
@@ -111,7 +114,7 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 			perror("Fork failed");
 		}
 		if(pid == 0) {
-			if(prog_settings::quiet) {
+			if(prog_settings::quiet || prog_settings::silent) {
 				int fd = open("/dev/null", O_WRONLY);
 				dup2(fd, 1);
 			}
@@ -181,7 +184,8 @@ void show_usage() {
 		<< "  -h, --help      show this help message\n"
 		<< "  -l, --list      list midi input/output ports\n"
 		<< "  -c, --config    Load alternate configuration file\n"
-		<< "  -q, --quiet     Supress output when reading midi input\n"
+		<< "  -q, --quiet     Supress normal output when reading midi input\n"
+		<< "  -s, --silent    Supress normal output and suppress errors\n"
 		;
 }
 

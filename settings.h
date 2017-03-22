@@ -51,6 +51,7 @@ extern config settings;
 // less confusing soon, someone will get hurt.
 namespace prog_settings {
 	extern bool quiet;
+	extern bool silent;
 }
 
 #endif
