@@ -181,9 +181,9 @@ void show_usage() {
 	// Prints usage/help information
 	std::cout 
 		<< "Usage: placeholder [OPTION]...\n"
+		<< "  -c, --config    Load alternate configuration file\n"
 		<< "  -h, --help      show this help message\n"
 		<< "  -l, --list      list midi input/output ports\n"
-		<< "  -c, --config    Load alternate configuration file\n"
 		<< "  -q, --quiet     Supress normal output when reading midi input\n"
 		<< "  -s, --silent    Supress normal output and suppress errors\n"
 		;
