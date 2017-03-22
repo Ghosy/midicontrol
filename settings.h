@@ -52,6 +52,7 @@ extern config settings;
 namespace prog_settings {
 	extern bool quiet;
 	extern bool silent;
+	extern bool verbose;
 }
 
 #endif

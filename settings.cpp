@@ -13,6 +13,9 @@ config::config() {
 }
 
 void config::read() {
+	if(prog_settings::verbose) {
+		std::cout << "Reading File: " << config_file_path << std::endl;
+	}
 	std::ifstream f(config_file_path.c_str());
 	std::string cline, name, value;
 	
@@ -119,6 +122,7 @@ void config::read() {
 							std::vector<unsigned char> low{i, next_ready, 0};
 							// TODO: Static cast is done here to avoid warning. Is there a better way?
 							std::vector<unsigned char> high{i, static_cast<unsigned char>(j - 1), 0};
+							// TODO: Does this need exec here or can I provide nothing?
 							Entry new_entry(low, high, "exec", LightMode::LIGHT_OFF, 0);
 							note_list.insert(new_entry);
 						}
@@ -279,4 +283,5 @@ std::string Entry::get_note() const {
 namespace prog_settings {
 	bool quiet = false;
 	bool silent = false;
+	bool verbose = false;
 }

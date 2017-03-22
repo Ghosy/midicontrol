@@ -20,15 +20,7 @@ int main(int argc, char* argv[]) {
 	// Cases for all arguments
 	for(int i = 1; i < argc; ++i) {
 		std::string arg = argv[i];
-		if((arg == "-h") || (arg == "--help")) {
-			show_usage();
-			return 0;
-		}
-		else if((arg == "-l") || (arg == "--list")) {
-			list_ports();
-			return 0;
-		}
-		else if((arg == "-c") || (arg == "--config")) {
+		if((arg == "-c") || (arg == "--config")) {
 			if(++i <= argc) {
 				// This should be integrated before this check area
 				settings.commandline_config(argv[i]);
@@ -37,11 +29,22 @@ int main(int argc, char* argv[]) {
 				std::cout << "No Config file was specified." << std::endl;
 			}
 		}
+		else if((arg == "-h") || (arg == "--help")) {
+			show_usage();
+			return 0;
+		}
+		else if((arg == "-l") || (arg == "--list")) {
+			list_ports();
+			return 0;
+		}
 		else if((arg == "-q") || (arg == "--quiet")) {
 			prog_settings::quiet = true;
 		}
 		else if((arg == "-s") || (arg == "--silent")) {
 			prog_settings::silent = true;
+		}
+		else if((arg == "-v") || (arg == "--verbose")) {
+			prog_settings::verbose = true;
 		}
 		// If the argument is not supported show_usage
 		else {
@@ -104,7 +107,12 @@ cleanup:
 void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
 	Entry temp_entry(*note_raw, *note_raw, "");
 	auto it = settings.note_list.find(temp_entry);
+
+	if(prog_settings::verbose) {
+		std::cout << "Incoming note: " << temp_entry.get_note() << std::endl;
+	}
 	
+	// If note is found in look up table
 	if(it != settings.note_list.end()) {
 		// Ensure all children are reaped
 		signal(SIGCHLD, SIG_IGN);
@@ -117,6 +125,9 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 			if(prog_settings::quiet || prog_settings::silent) {
 				int fd = open("/dev/null", O_WRONLY);
 				dup2(fd, 1);
+			}
+			if(prog_settings::verbose) {
+				std::cout << "Note: " << temp_entry.get_note() << "\nExectuting: " << it->action << std::endl;
 			}
 			// Do the action associated with the corresponding midi note
 			execl("/bin/sh", "sh", "-c", it->action.c_str(), NULL);
@@ -182,11 +193,13 @@ void show_usage() {
 	// Prints usage/help information
 	std::cout 
 		<< "Usage: placeholder [OPTION]...\n"
-		<< "  -c, --config    Load alternate configuration file\n"
-		<< "  -h, --help      show this help message\n"
-		<< "  -l, --list      list midi input/output ports\n"
-		<< "  -q, --quiet     Supress normal output when reading midi input\n"
-		<< "  -s, --silent    Supress normal output and suppress errors\n"
+		<< "  -c, --config     Load alternate configuration file\n"
+		<< "  -h, --help       show this help message\n"
+		<< "  -l, --list       list midi input/output ports\n"
+		<< "  -q, --quiet      Supress normal output when reading midi input\n"
+		<< "  -s, --silent     Supress normal output and suppress errors\n"
+		<< "  -v, --verbose    Print extra information during reading input\n"
+		<< "                     --quiet and --silent override --verbose\n"
 		;
 }
 
