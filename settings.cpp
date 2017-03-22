@@ -54,6 +54,14 @@ void config::read() {
 					LightMode new_mode;
 					unsigned char new_light_value;
 					
+					// TODO: Program wraps to 255 value, but should this not add light data to entry?
+					// Warn if light value not in range
+					int light_val = stoi(entry_list[2]);
+					if(light_val > 255 || light_val < 0) {
+						if(!prog_settings::silent) {
+							std::cerr << light_val << " is not a valid light value" << std::endl;
+						}
+					}
 					// Find correct light mode
 					if(entry_list[1] == "light_push") {
 						new_mode = LightMode::LIGHT_PUSH;
