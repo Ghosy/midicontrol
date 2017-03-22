@@ -1,8 +1,14 @@
+/*
+ * placeholder
+ * Implementation of entry class for placeholder
+ * Copyright(c) 2017 Zachary Matthews.
+ */
 #include <iostream>
 #include <vector>
 #include <sstream>
 
 #include "entry.h"
+
 Entry::Entry() {
 }
 

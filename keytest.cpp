@@ -1,3 +1,8 @@
+/*
+ * placeholder
+ * Main class for placeholder
+ * Copyright(c) 2017 Zachary Matthews.
+ */
 #include <fcntl.h>
 #include <iostream>
 #include <signal.h>

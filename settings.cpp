@@ -1,3 +1,8 @@
+/*
+ * placeholder
+ * Implementation of setting loading for placeholder
+ * Copyright(c) 2017 Zachary Matthews.
+ */
 #include <iostream>
 #include <vector>
 #include <fstream>

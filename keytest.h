@@ -1,3 +1,8 @@
+/*
+ * placeholder
+ * Header file for keytest.cpp
+ * Copyright(c) 2017 Zachary Matthews.
+ */
 #ifndef KEYTEST_H_
 #define KEYTEST_H_
 

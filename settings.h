@@ -1,3 +1,8 @@
+/*
+ * placeholder
+ * Header file for settings.cpp
+ * Copyright(c) 2017 Zachary Matthews.
+ */
 #ifndef SETTINGS_H_
 #define SETTINGS_H_
 

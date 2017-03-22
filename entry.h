@@ -1,3 +1,8 @@
+/*
+ * placeholder
+ * Header file for entry.cpp
+ * Copyright(c) 2017 Zachary Matthews.
+ */
 #ifndef ENTRY_H_
 #define ENTRY_H_
 
