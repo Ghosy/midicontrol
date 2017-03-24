@@ -16,21 +16,21 @@ Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, 
 	: action(new_action),
 	light_mode(LightMode::NONE),
 	light_value(0) {
-	for(int i = 0; i < 3; ++i) {
-		min[i] = lows[i];
-		max[i] = highs[i];
+		for(int i = 0; i < 3; ++i) {
+			min[i] = lows[i];
+			max[i] = highs[i];
+		}
 	}
-}
 
 Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value)
 	: action(new_action),
 	light_mode(new_mode),
 	light_value(new_light_value) {
-	for(int i = 0; i < 3; ++i) {
-		min[i] = lows[i];
-		max[i] = highs[i];
+		for(int i = 0; i < 3; ++i) {
+			min[i] = lows[i];
+			max[i] = highs[i];
+		}
 	}
-}
 
 bool Entry::contains(const std::vector<unsigned char>& note) const {
 	for(int i = 0; i < 3; ++i) {
