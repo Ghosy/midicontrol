@@ -7,7 +7,6 @@
 #define SETTINGS_H_
 
 #include <set>
-#include <utility>
 
 #include "entry.h"
 

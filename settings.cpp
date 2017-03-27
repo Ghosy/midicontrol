@@ -3,10 +3,10 @@
  * Implementation of setting loading for placeholder
  * Copyright(c) 2017 Zachary Matthews.
  */
-#include <iostream>
-#include <vector>
 #include <fstream>
+#include <iostream>
 #include <sstream>
+#include <vector>
 
 #include "entry.h"
 #include "settings.h"

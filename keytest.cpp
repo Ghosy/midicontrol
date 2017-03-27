@@ -6,10 +6,10 @@
 #include <fcntl.h>
 #include <iostream>
 #include <signal.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <sys/types.h>
 #include <sstream>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 #include "keytest.h"
 #include "rtmidi/RtMidi.h"
