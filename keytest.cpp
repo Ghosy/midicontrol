@@ -5,6 +5,7 @@
  */
 #include <fcntl.h>
 #include <iostream>
+#include <regex>
 #include <signal.h>
 #include <sstream>
 #include <sys/types.h>
@@ -143,8 +144,11 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 			if(prog_settings::verbose) {
 				std::cout << "Note: " << temp_entry.get_note() << "\nExectuting: " << it->action << std::endl;
 			}
+			std::string command = it->action;
+			// Replace instances of note value label with current note value
+			command = std::regex_replace(command, std::regex("NOTE"), std::to_string(temp_entry.min[2]));
 			// Do the action associated with the corresponding midi note
-			execl("/bin/sh", "sh", "-c", it->action.c_str(), NULL);
+			execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
 			_exit(0);
 		}
 
