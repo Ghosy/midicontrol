@@ -1,6 +1,8 @@
-/*
- * placeholder
- * Header file for settings.cpp
+/**
+ * @file
+ * @brief Implementation of setting loading for placeholder
+ * @author Zachary Matthews
+ *
  * Copyright(c) 2017 Zachary Matthews.
  */
 #ifndef SETTINGS_H_
