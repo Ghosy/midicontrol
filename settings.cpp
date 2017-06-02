@@ -1,6 +1,8 @@
-/*
- * placeholder
- * Implementation of setting loading for placeholder
+/**
+ * @file
+ * @brief Implementation of settings class for placeholder
+ * @author Zachary Matthews
+ *
  * Copyright(c) 2017 Zachary Matthews.
  */
 #include <fstream>

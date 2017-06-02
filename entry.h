@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Implementation of entry class for placeholder
+ * @brief Header of entry class for placeholder
  * @author Zachary Matthews
  *
  * Copyright(c) 2017 Zachary Matthews.

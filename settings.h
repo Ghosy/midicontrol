@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Implementation of setting loading for placeholder
+ * @brief Header of settings class for placeholder
  * @author Zachary Matthews
  *
  * Copyright(c) 2017 Zachary Matthews.

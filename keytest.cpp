@@ -1,6 +1,8 @@
-/*
- * placeholder
- * Main class for placeholder
+/**
+ * @file
+ * @brief Implementation the main class for placeholder
+ * @author Zachary Matthews
+ *
  * Copyright(c) 2017 Zachary Matthews.
  */
 #include <fcntl.h>

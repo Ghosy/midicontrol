@@ -1,6 +1,6 @@
 /**
  * @file
- * @brief Main for placeholder
+ * @brief Header of the main class for placeholder
  * @author Zachary Matthews
  *
  * Copyright(c) 2017 Zachary Matthews.
