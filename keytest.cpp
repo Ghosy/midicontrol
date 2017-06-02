@@ -147,8 +147,11 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 				std::cout << "Note: " << temp_entry.get_note() << "\nExectuting: " << it->action << std::endl;
 			}
 			std::string command = it->action;
+			// TODO: Break up regex_replace arguements for readablity
 			// Replace instances of note value label with current note value
-			command = std::regex_replace(command, std::regex("NOTE"), std::to_string(temp_entry.min[2]));
+			command = std::regex_replace(command, std::regex("(NOTE)([^%])"), std::to_string(temp_entry.min[2]) + "$2");
+			std::cout << command << std::endl;
+			command = std::regex_replace(command, std::regex("NOTE%"), std::to_string((int)temp_entry.min[2] * 100 / 127));
 			// Do the action associated with the corresponding midi note
 			execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
 			_exit(0);
