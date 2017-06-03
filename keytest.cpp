@@ -5,9 +5,9 @@
  *
  * Copyright(c) 2017 Zachary Matthews.
  */
+#include <boost/regex.hpp>
 #include <fcntl.h>
 #include <iostream>
-#include <regex>
 #include <signal.h>
 #include <sstream>
 #include <sys/types.h>
@@ -149,9 +149,10 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 			std::string command = it->action;
 			// TODO: Break up regex_replace arguements for readablity
 			// Replace instances of note value label with current note value
-			command = std::regex_replace(command, std::regex("(NOTE)([^%])"), std::to_string(temp_entry.min[2]) + "$2");
+			command = boost::regex_replace(command, boost::regex("(?<!\\\\)NOTE(?!%)", boost::regex::perl), std::to_string(temp_entry.min[2]));
 			std::cout << command << std::endl;
-			command = std::regex_replace(command, std::regex("NOTE%"), std::to_string((int)temp_entry.min[2] * 100 / 127));
+			command = boost::regex_replace(command, boost::regex("(?<!\\\\)NOTE%", boost::regex::perl), std::to_string((int)temp_entry.min[2] * 100 / 127));
+			command = boost::regex_replace(command, boost::regex("\\\\NOTE", boost::regex::perl), "NOTE");
 			// Do the action associated with the corresponding midi note
 			execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
 			_exit(0);
