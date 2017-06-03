@@ -150,7 +150,6 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 			// TODO: Break up regex_replace arguements for readablity
 			// Replace instances of note value label with current note value
 			command = boost::regex_replace(command, boost::regex("(?<!\\\\)NOTE(?!%)", boost::regex::perl), std::to_string(temp_entry.min[2]));
-			std::cout << command << std::endl;
 			command = boost::regex_replace(command, boost::regex("(?<!\\\\)NOTE%", boost::regex::perl), std::to_string((int)temp_entry.min[2] * 100 / 127));
 			command = boost::regex_replace(command, boost::regex("\\\\NOTE", boost::regex::perl), "NOTE");
 			// Do the action associated with the corresponding midi note
