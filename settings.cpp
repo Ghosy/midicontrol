@@ -25,20 +25,20 @@ void config::read() {
 		std::cout << "Reading File: " << config_file_path << std::endl;
 	}
 	std::ifstream f(config_file_path.c_str());
-	std::string cline, name, value;
+	std::string line, name, value;
 
 	if(!f.is_open())
 		return;
 
 	while(!f.eof()) {
-		getline(f, cline);
+		getline(f, line);
 
-		if(!cline.empty() && cline[0] != '#') {
+		if(!line.empty() && line[0] != '#') {
 			int pos;
-			pos = cline.find("=");
+			pos = line.find("=");
 
-			name = trim(cline.substr(0, pos));
-			value = trim(cline.substr(pos + 1, cline.length() - pos));
+			name = trim(line.substr(0, pos));
+			value = trim(line.substr(pos + 1, line.length() - pos));
 
 			if(name == "device") {
 				midi_device = value;
