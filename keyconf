@@ -21,6 +21,7 @@ device = Launchpad
 	144,34,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/SadAirhorn.wav, light_wait, 60
 	144,35,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/MontyPythonIntermission.wav, light_wait, 60
 	144,36,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/YouGetNothing.wav, light_wait, 60
+	144,37,127 = ~/projects/soundboard/soundboard.sh -o -f ~/projects/soundboard/clips/Tuskan.wav, light_wait, 60
 	144,39,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/JeopardyTheme.wav, light_wait, 60
 	144,48,127 = echo "clientupdate client_input_muted=1" | nc localhost 25639 >> /dev/null
 	144,49,127 = echo "clientupdate client_input_muted=0" | nc localhost 25639 >> /dev/null
