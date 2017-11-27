@@ -25,7 +25,8 @@ enum class LightMode {
 	LIGHT_PUSH,
 	LIGHT_ON,
 	LIGHT_OFF,
-	LIGHT_WAIT
+	LIGHT_WAIT,
+	LIGHT_CHECK
 };
 
 class Entry
@@ -52,6 +53,17 @@ class Entry
 		 * @param new_light_value A value between 0-255 indicating the light value
 		 */
 		Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value);
+
+		/**
+		 * @brief Create Entry with light settings
+		 * @param lows A vector containing the lower bound of the midi note
+		 * @param highs A vector containing the upper bound of the midi note
+		 * @param new_action A string containing the corresponding command for the defined midi note
+		 * @param new_mode A light mode corresponding to the midi note
+		 * @param new_light_value A value between 0-255 indicating the light value
+		 * @param new_light_check A string containing the corresponding command for LIGHT_CHECK
+		 */
+		Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value, std::string new_light_check);
 
 		/**
 		 * @brief Returns true if and only if the Entry contains the specified midi note
@@ -84,9 +96,15 @@ class Entry
 		LightMode light_mode;
 
 		/**
+		 * @brief A string containing the corresponding command for LIGHT_CHECK
+		 */
+		std::string light_check;
+
+		/**
 		 * @brief A value between 0-255 indicating the light value
 		 */
 		unsigned char light_value;
+
 
 		/**
 		 * @brief An array containing the lower bounds of midi note

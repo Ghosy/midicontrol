@@ -64,6 +64,7 @@ void config::read() {
 				if(entry_list.size() >= 2) {
 					LightMode new_mode;
 					unsigned char new_light_value;
+					std::string new_light_check = "";
 
 					// TODO: Program wraps to 255 value, but should this not add light data to entry?
 					// Warn if light value not in range
@@ -90,6 +91,11 @@ void config::read() {
 						new_mode = LightMode::LIGHT_WAIT;
 						new_light_value = stoi(entry_list[2]);
 					}
+					else if(entry_list[1] == "light_check") {
+						new_mode = LightMode::LIGHT_CHECK;
+						new_light_value = stoi(entry_list[2]);
+						new_light_check = entry_list[3];
+					}
 					else {
 						// Print error light_mode not valid
 						Entry err_entry(lows, highs, "");
@@ -99,7 +105,7 @@ void config::read() {
 						}
 					}
 
-					new_entry = Entry(lows, highs, entry_list[0], new_mode, new_light_value);
+					new_entry = Entry(lows, highs, entry_list[0], new_mode, new_light_value, new_light_check);
 				}
 				else {
 					new_entry = Entry(lows, highs, entry_list[0]);
@@ -113,6 +119,7 @@ void config::read() {
 
 	// Look through all entries for LIGHT_PUSH missing LIGHT_OFF
 	// TODO: Try and clean this up. It's a mess
+	// TODO: Maybe reduce using range-based for loop
 	for(auto it = note_list.begin(); it != note_list.end(); ++it) {
 		if(it->light_mode == LightMode::LIGHT_PUSH) {
 			// Sort through xx,00,00 of note
@@ -235,4 +242,5 @@ namespace prog_settings {
 	bool quiet = false;
 	bool silent = false;
 	bool verbose = false;
+	unsigned int delay = 50;
 }

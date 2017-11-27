@@ -41,4 +41,9 @@ void input_scan(std::string device);
  */
 void input_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata);
 
+/**
+ * @brief Start the checker for notes with light_mode of LIGHT_CHECK
+ */
+void light_state_check();
+
 #endif
