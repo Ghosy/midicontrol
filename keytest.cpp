@@ -340,6 +340,12 @@ void input_scan(std::string device) {
 			midiin->openPort(i);
 		}
 	}
+
+	// Check to ensure a port was opened
+	if(!midiin->isPortOpen()) {
+		std::cerr << "Failed to open device \"" << device << "\"" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	// Set callback function
 	// Make sure this always follows opening of port
 	// to prevent messages ending up in queue
