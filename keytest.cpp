@@ -35,17 +35,24 @@ int main(int argc, char* argv[]) {
 				settings.commandline_config(argv[i]);
 			}
 			else {
-				std::cerr << "No Config file was specified." << std::endl;
+				std::cerr << "No Configuration file was specified." << std::endl;
 			}
 		}
 		else if((arg == "-d") || (arg == "--delay")) {
 			if(++i < argc) {
-				unsigned int delay = std::stoi(argv[i]);
-				if(delay > 0) {
-					prog_settings::delay = delay;
+
+				try {
+					unsigned int delay = std::stoi(argv[i]);
+					if(delay > 0) {
+						prog_settings::delay = delay;
+					}
+					else {
+						std::cerr << "The delay specified must be greater than 0" << std::endl;
+					}
 				}
-				else {
-					std::cerr << "The delay specified must be greater than 0" << std::endl;
+				catch(...) {
+					std::cerr << argv[i] << " is not a valid value for delay" << std::endl;
+					return 1;
 				}
 			}
 			else {
@@ -90,6 +97,7 @@ int main(int argc, char* argv[]) {
 
 void scan_ports() {
 	settings.read();
+
 	try {
 		midiin = new RtMidiIn();
 		midiout = new RtMidiOut();
@@ -219,7 +227,7 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 					break;
 				}
 				case LightMode::LIGHT_CHECK: {
-					// Do nothing this mode is not checked on note sent
+					// Do nothing this mode is not checked on note received
 					break;
 				}
 				default: {
@@ -243,8 +251,8 @@ void show_usage() {
 		<< "  -h, --help            Show this help message\n"
 		<< "  -i, --input=DEVICE    Print specified midi device's incoming input\n"
 		<< "  -l, --list            List midi input/output ports\n"
-		<< "  -q, --quiet           Supress normal output when reading midi input\n"
-		<< "  -s, --silent          Supress normal output and suppress errors\n"
+		<< "  -q, --quiet           Suppress normal output when reading midi input\n"
+		<< "  -s, --silent          Suppress normal output and suppress errors\n"
 		<< "  -v, --verbose         Print extra information during reading input\n"
 		<< "                          --quiet and --silent override --verbose\n"
 		;
@@ -253,7 +261,7 @@ void show_usage() {
 void list_ports() {
 	RtMidiIn  *midiin = 0;
 	RtMidiOut *midiout = 0;
-	// RtMidiIn constructor
+	// RtMidiIn initialization
 	try {
 		midiin = new RtMidiIn();
 	}
@@ -275,7 +283,7 @@ void list_ports() {
 		}
 		std::cout << "  Input Port #" << i << ": " << portName << std::endl;
 	}
-	// RtMidiOut constructor
+	// RtMidiOut initialization
 	try {
 		midiout = new RtMidiOut();
 	}
@@ -350,6 +358,7 @@ cleanup:
 
 void input_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
 	Entry temp_entry(*note_raw, *note_raw, "");
+	// Print note received
 	std::cout << "Note: " << temp_entry.get_note() << std::endl;
 }
 
@@ -380,6 +389,7 @@ void light_state_check() {
 					// Ensure the full range is covered for the notes
 					// Turn on leds
 					for(int i = e.min[1]; i <= e.max[1]; ++i) {
+						// Send midi note on, 144,xx,light_value
 						message.push_back(144);
 						message.push_back(i);
 						message.push_back(e.light_value);
@@ -392,6 +402,7 @@ void light_state_check() {
 					// Ensure the full range is covered for the notes
 					// Turn off leds
 					for(int i = e.min[1]; i <= e.max[1]; ++i) {
+						// Send midi note off, 144,xx,00
 						message.push_back(144);
 						message.push_back(i);
 						message.push_back(0);
@@ -408,6 +419,5 @@ void light_state_check() {
 			// wait for delay time
 			usleep(prog_settings::delay * 1000);
 		}
-		// _exit(0);
 	}
 }

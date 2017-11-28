@@ -128,6 +128,7 @@ void config::read() {
 				unsigned char next_ready = it->min[1];
 				// Sort through 00,xx,00 of note
 				for(unsigned char j = it->min[1]; j <= it->max[1]; ++j) {
+					// Try to find midi note off, aka xx,xx,00
 					Entry temp_entry({i,j,0}, {i,j,0}, "");
 					std::set<Entry>::iterator it_find = settings.note_list.find(temp_entry);
 
