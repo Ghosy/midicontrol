@@ -171,12 +171,9 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 			if(prog_settings::verbose) {
 				std::cout << "Note: " << temp_entry.get_note() << "\nExecuting: " << it->action << std::endl;
 			}
-			std::string command = it->action;
-			// TODO: Break up regex_replace arguments for readability
-			// Replace instances of note value label with current note value
-			command = boost::regex_replace(command, boost::regex("(?<!\\\\)NOTE(?!%)", boost::regex::perl), std::to_string(temp_entry.min[2]));
-			command = boost::regex_replace(command, boost::regex("(?<!\\\\)NOTE%", boost::regex::perl), std::to_string((int)temp_entry.min[2] * 100 / 127));
-			command = boost::regex_replace(command, boost::regex("\\\\NOTE", boost::regex::perl), "NOTE");
+			// TODO: Should this be hardcoded with min[2]?
+			std::string command = note_replace(it->action, (int)temp_entry.min[2]);
+
 			// Do the action associated with the corresponding midi note
 			execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
 			_exit(0);
@@ -196,6 +193,7 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 					break;
 				}
 				case LightMode::LIGHT_OFF: {
+					std::cout << "aoeu" << std::endl;
 					message.push_back(144);
 					message.push_back((int)note_raw->at(1));
 					message.push_back(0);
@@ -227,6 +225,10 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 					break;
 				}
 				case LightMode::LIGHT_CHECK: {
+					// Do nothing this mode is not checked on note received
+					break;
+				}
+				case LightMode::LIGHT_VAR: {
 					// Do nothing this mode is not checked on note received
 					break;
 				}
@@ -364,8 +366,12 @@ void input_read(double deltatime, std::vector<unsigned char> *note_raw, void *us
 
 void light_state_check() {
 	std::set<Entry> check_list;
+	std::set<Entry> var_list;
 	// Filter out entries with LIGHT_CHECK
 	std::copy_if(settings.note_list.begin(), settings.note_list.end(), std::inserter(check_list, check_list.end()), [](const Entry e){return (e.light_mode == LightMode::LIGHT_CHECK);});
+
+	// Filter out entries with LIGHT_VAR
+	std::copy_if(settings.note_list.begin(), settings.note_list.end(), std::inserter(var_list, var_list.end()), [](const Entry e){return (e.light_mode == LightMode::LIGHT_VAR);});
 
 	// Fork for checker child
 	pid_t pid_checker = fork();
@@ -374,15 +380,17 @@ void light_state_check() {
 		perror("Fork failed");
 	}
 	if(pid_checker == 0) {
+		// Install an interrupt handler function.
+		(void) signal(SIGINT, finish);
 		// Ensures this child exits when the rest of the program does
 		while(!done) {
 			for(auto e: check_list) {
 				int ret;
 				std::vector<unsigned char> message;
 
-				// Get exit status of light_check command
+				// Get exit status of light_command
 				// TODO: Make this section consider verbosity
-				ret = WEXITSTATUS(system(e.light_check.c_str()));
+				ret = WEXITSTATUS(system(e.light_command.c_str()));
 
 				// Positive response(grep found)
 				if(ret == 0) {
@@ -416,8 +424,44 @@ void light_state_check() {
 				}
 
 			}
+
+			for(auto e: var_list) {
+				std::string data;
+				FILE * stream;
+				const int max_buffer = 256;
+				char buffer[max_buffer];
+				// Only get stdout
+				std::string command = e.light_command.append(" 2>&1");
+
+				stream = popen(command.c_str(), "r");
+				if(stream) {
+					while(!feof(stream))
+						if(fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
+					pclose(stream);
+				}
+				int new_light_value = std::stoi(data);
+
+				std::vector<unsigned char> message;
+				for(int i = e.min[1]; i <= e.max[1]; ++i) {
+					// Send midi note off, 144,xx,00
+					message.push_back(144);
+					message.push_back(i);
+					message.push_back(new_light_value);
+					midiout->sendMessage(&message);
+					message.clear();
+				}
+			}
 			// wait for delay time
 			usleep(prog_settings::delay * 1000);
 		}
 	}
+}
+
+std::string note_replace(std::string s, unsigned int note) {
+			// TODO: Break up regex_replace arguments for readability
+			// Replace instances of note value label with current note value
+			s = boost::regex_replace(s, boost::regex("(?<!\\\\)NOTE(?!%)", boost::regex::perl), std::to_string(note));
+			s = boost::regex_replace(s, boost::regex("(?<!\\\\)NOTE%", boost::regex::perl), std::to_string(note * 100 / 127));
+			s = boost::regex_replace(s, boost::regex("\\\\NOTE", boost::regex::perl), "NOTE");
+			return s;
 }

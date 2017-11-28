@@ -46,4 +46,9 @@ void input_read(double deltatime, std::vector<unsigned char> *note_raw, void *us
  */
 void light_state_check();
 
+/**
+ * @brief Replace occurrences of NOTE and NOTE% with corresponding value
+ */
+std::string note_replace(std::string s, unsigned int note);
+
 #endif

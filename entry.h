@@ -19,6 +19,10 @@
  * Turn off light when note pressed
  * @var LightMode::LIGHT_WAIT
  * Turn on light when note pressed and off when triggered action finishes
+ * @var LightMode::LIGHT_CHECK
+ * Turn on light when command has a return value of 0
+ * @var LightMode::LIGHT_VAR
+ * Change light level based on command return
  */
 enum class LightMode {
 	NONE,
@@ -26,7 +30,8 @@ enum class LightMode {
 	LIGHT_ON,
 	LIGHT_OFF,
 	LIGHT_WAIT,
-	LIGHT_CHECK
+	LIGHT_CHECK,
+	LIGHT_VAR
 };
 
 class Entry
@@ -61,9 +66,9 @@ class Entry
 		 * @param new_action A string containing the corresponding command for the defined midi note
 		 * @param new_mode A light mode corresponding to the midi note
 		 * @param new_light_value A value between 0-255 indicating the light value
-		 * @param new_light_check A string containing the corresponding command for LIGHT_CHECK
+		 * @param new_light_command A string containing the corresponding command for LIGHT_CHECK and LIGHT_VAR
 		 */
-		Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value, std::string new_light_check);
+		Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value, std::string new_light_command);
 
 		/**
 		 * @brief Returns true if and only if the Entry contains the specified midi note
@@ -96,9 +101,9 @@ class Entry
 		LightMode light_mode;
 
 		/**
-		 * @brief A string containing the corresponding command for LIGHT_CHECK
+		 * @brief A string containing the corresponding command for LIGHT_CHECK and LIGHT_VAR
 		 */
-		std::string light_check;
+		std::string light_command;
 
 		/**
 		 * @brief A value between 0-255 indicating the light value

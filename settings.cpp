@@ -64,16 +64,17 @@ void config::read() {
 				if(entry_list.size() >= 2) {
 					LightMode new_mode;
 					unsigned char new_light_value;
-					std::string new_light_check = "";
+					std::string new_light_command = "";
 
 					// TODO: Program wraps to 255 value, but should this not add light data to entry?
+					// TODO: Make compatible with light_var
 					// Warn if light value not in range
-					int light_val = stoi(entry_list[2]);
-					if(light_val > 255 || light_val < 0) {
-						if(!prog_settings::silent) {
-							std::cerr << light_val << " is not a valid light value" << std::endl;
-						}
-					}
+					//int light_val = stoi(entry_list[2]);
+					// if(light_val > 255 || light_val < 0) {
+					// 	if(!prog_settings::silent) {
+					// 		std::cerr << light_val << " is not a valid light value" << std::endl;
+					// 	}
+					// }
 					// Find correct light mode
 					if(entry_list[1] == "light_push") {
 						new_mode = LightMode::LIGHT_PUSH;
@@ -94,7 +95,12 @@ void config::read() {
 					else if(entry_list[1] == "light_check") {
 						new_mode = LightMode::LIGHT_CHECK;
 						new_light_value = stoi(entry_list[2]);
-						new_light_check = entry_list[3];
+						new_light_command = entry_list[3];
+					}
+					else if(entry_list[1] == "light_var") {
+						new_mode = LightMode::LIGHT_VAR;
+						new_light_value = 0;
+						new_light_command = entry_list[2];
 					}
 					else {
 						// Print error light_mode not valid
@@ -105,7 +111,7 @@ void config::read() {
 						}
 					}
 
-					new_entry = Entry(lows, highs, entry_list[0], new_mode, new_light_value, new_light_check);
+					new_entry = Entry(lows, highs, entry_list[0], new_mode, new_light_value, new_light_command);
 				}
 				else {
 					new_entry = Entry(lows, highs, entry_list[0]);

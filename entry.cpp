@@ -20,10 +20,10 @@ Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, 
 Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value)
 	: Entry::Entry(lows, highs, new_action, new_mode, new_light_value, "") {}
 
-Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value, std::string new_light_check)
+Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value, std::string new_light_command)
 	: action(new_action),
 	light_mode(new_mode),
-	light_check(new_light_check),
+	light_command(new_light_command),
 	light_value(new_light_value) {
 		for(int i = 0; i < 3; ++i) {
 			min[i] = lows[i];
