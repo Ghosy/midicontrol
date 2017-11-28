@@ -169,10 +169,10 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 				dup2(fd, 1);
 			}
 			if(prog_settings::verbose) {
-				std::cout << "Note: " << temp_entry.get_note() << "\nExectuting: " << it->action << std::endl;
+				std::cout << "Note: " << temp_entry.get_note() << "\nExecuting: " << it->action << std::endl;
 			}
 			std::string command = it->action;
-			// TODO: Break up regex_replace arguements for readablity
+			// TODO: Break up regex_replace arguments for readability
 			// Replace instances of note value label with current note value
 			command = boost::regex_replace(command, boost::regex("(?<!\\\\)NOTE(?!%)", boost::regex::perl), std::to_string(temp_entry.min[2]));
 			command = boost::regex_replace(command, boost::regex("(?<!\\\\)NOTE%", boost::regex::perl), std::to_string((int)temp_entry.min[2] * 100 / 127));
