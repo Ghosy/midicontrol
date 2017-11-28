@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
 				}
 				catch(...) {
 					std::cerr << argv[i] << " is not a valid value for delay" << std::endl;
-					return 1;
+					exit(EXIT_FAILURE);
 				}
 			}
 			else {
