@@ -193,7 +193,6 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 					break;
 				}
 				case LightMode::LIGHT_OFF: {
-					std::cout << "aoeu" << std::endl;
 					message.push_back(144);
 					message.push_back((int)note_raw->at(1));
 					message.push_back(0);
