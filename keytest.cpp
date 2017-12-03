@@ -250,7 +250,7 @@ void show_usage() {
 		<< "  -d, --delay=DELAY     Specify the delay time for LIGHT_CHECK\n"
 		<< "                          Defaults to 50ms\n"
 		<< "  -h, --help            Show this help message\n"
-		<< "  -i, --input=DEVICE    Print specified midi device's incoming input\n"
+		<< "  -i, --input=DEVICE    Print incoming midi notes from DEVICE\n"
 		<< "  -l, --list            List midi input/output ports\n"
 		<< "  -q, --quiet           Suppress normal output when reading midi input\n"
 		<< "  -s, --silent          Suppress normal output and suppress errors\n"
