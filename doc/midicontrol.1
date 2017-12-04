@@ -1,0 +1,153 @@
+.\" Manpage for midicontrol
+
+.TH MIDICONTROL 1 "03 December 2017" "0.1" "midicontrol man page"
+.SH NAME
+midicontrol \- interpret midi commands into shell commands
+.SH SYNOPSIS
+.BR midicontrol " [\fIOPTION\fP]"
+.SH DESCRIPTION
+.B midicontrol
+is program, which takes input from midi controllers and executes a corresponding command based on a user-provided configuration file. If supported by the midi controller,
+.B midicontrol
+can also change light settings, based on multiple light modes.
+.SH OPTIONS
+.TP
+.BR \-c ", " \-\-config "=\fIFILE\fP"
+Load alternate configuration file
+.TP
+.BR \-d ", " \-\-delay "=\fIDELAY\fP"
+Specify the delay time for LIGHT_CHECK mode
+.TP
+.BR \-h ", " \-\-help
+Show the help message for
+.B midicontrol
+.TP
+.BR \-i ", " \-\-input "=\fIDEVICE\fP"
+Print incoming midi notes from DEVICE
+.TP
+.BR \-l ", " \-\-list
+List midi input/output ports
+.TP
+.BR \-q ", " \-\-quiet
+Suppress normal output when reading midi input
+.TP
+.BR \-s ", " \-\-silent
+Supress normal ouput and suppress errors
+.TP
+.BR \-v ", " \-\-verbose
+Print extra information during reading input
+.B \-\-quiet
+and
+.B \-\-silent
+override
+.B \-\-verbose
+.SH FILES
+.I $HOME/.midicontrolrc
+.PP
+.I $XDG_CONFIG_HOME/midicontrol/midicontrolrc
+.SS Description
+This file is the configuration file loaded by default when
+.B midicontrol
+starts in normal mode. The program specifies what device the configuration will be run on and the rules for handling incoming midi notes from the specified device.
+.SS Command Format
+MIDI_NOTE \fB=\fP COMMAND[, LIGHT_MODE[, LIGHT_OPTION]...]
+.RS
+.TP
+.B MIDI_NOTE
+The MIDI_NOTE is the value of the midi note, from the specified device, which will trigger the corresponding command. The format of each note is 3 values seperated by commas, which can range from 0-255.
+.TP
+.B COMMAND
+The COMMAND is the value that will be run when the corresponding midi note is given by the device specified in the configuration file.
+
+Example: mpc -q toggle
+.TP
+.B LIGHT_MODES
+.RS
+.TP
+light_push
+Turn on light when note is pressed and off when released
+.TP
+light_on
+Turn on light when note is pressed
+.TP
+light_off
+Turn off light when note is pressed
+.TP
+light_wait
+Turn on light when note is pressed and off when triggered command finishes
+.TP
+light_check
+Turn on light when light_command has a return value of 0
+.TP
+light_var
+Change light level based on value output by light_command
+.RE
+.TP
+.B LIGHT_OPTIONS
+.RS
+Light options are additional information used by the different LIGHT_MODES. The amount of options needed by each LIGHT_MODE varies and is specified in parentheses next to each LIGHT_MODE in the list below. Under each LIGHT_MODE is the different options that are required. The order of the options must be as labeled for the LIGHT_MODE to function properly. The two options that may be present are light_value and light_command. Light_value must be a value from 0 to 255. Light_command must be a valid command on the system \fBmidicontrol\fP is running on.
+.TP
+light_push (1)
+\fB1.\fP light_value
+.TP
+light_on (1)
+\fB1.\fP light_value
+.TP
+light_off (0)
+No LIGHT_OPTIONS apply to light_off
+.TP
+light_wait (1)
+\fB1.\fP light_command
+.TP
+light_check (2)
+\fB1.\fP light_value
+\fB2.\fP light_command
+.TP
+light_var (1)
+\fB1.\fP light_command
+.RE
+.RE
+.SS Sample Configuration
+.TP
+device = Launchpad
+.RS
+144,0,127 = mpc -q prev, light_push, 60
+.br
+144,1,127 = mpc -q toggle, light_check, 60, mpc | grep -q "\\[playing\\]"
+.br
+144,2,127 = mpc -q next, light_push, 60
+.br
+144,3,127 = mpc -q volume -5, light_push, 60
+.br
+144,4,127 = mpc -q volume +5, light_push, 60
+.br
+144,5,127 = mpc -q repeat, light_check, 60, mpc | grep -q "repeat: on"
+.br
+144,6,127 = mpc -q single, light_check, 60, mpc | grep -q "single: on"
+.br
+144,7,127 = mpc -q random, light_check, 60, mpc | grep -q "random: on"
+.br
+144,16,127 = mpc -q clear && mpc -q load Reflections\ in\ Sand >> /dev/null
+.br
+144,17,127 = mpc -q clear && mpc -q load Noble\ Beast >> /dev/null
+.br
+144,18,127 = mpc -q clear && mpc -q load Break\ From\ This\ World >> /dev/null
+.br
+144,19,127 = mpc -q clear && mpc -q load Transistor\ OST >> /dev/null
+.br
+144,20,127 = mpc -q clear && mpc -q load Stan\ SB >> /dev/null
+.br
+144,21,127 = mpc -q clear && mpc -q load PPPPPP >> /dev/null
+.br
+144,22,127 = mpc -q clear && mpc -q load A\ Prague\ Spring >> /dev/null
+.br
+144,23,127 = mpc -q clear && mpc -q load VPR >> /dev/null
+.br
+144,24,127 = mpc -q clear
+.br
+144,39,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/JeopardyTheme.wav, light_wait, 60
+.RE
+.SH BUGS
+No known bugs.
+.SH AUTHOR
+Zachary Matthews (zacharymatt5@gmail.com)

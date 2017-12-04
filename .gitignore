@@ -1,4 +1,6 @@
 doc/*
+!doc/Doxyfile
+!doc/midicontrol.1
 test/*
 TODO
 key
