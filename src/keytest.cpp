@@ -137,6 +137,12 @@ void scan_ports() {
 			midiout->openPort(i);
 		}
 	}
+
+	// Check to ensure a port was opened
+	if(!midiin->isPortOpen()) {
+		std::cerr << "Failed to open device \"" << settings.getDevice() << "\"" << std::endl;
+		exit(EXIT_FAILURE);
+	}
 	// Set callback function
 	// Make sure this always follows opening of port
 	// to prevent messages ending up in queue
