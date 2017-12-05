@@ -9,6 +9,8 @@ SRCDIR := src
 BUILDDIR := build
 # Exec name
 TARGET := bin/midicontrol
+# Documents directory
+DOCSDIR := doc
 
 # Libraries linked to exec
 LIBS = -lrtmidi -lboost_regex
@@ -30,7 +32,13 @@ $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 
 clean:
 	@echo " Cleaning..."
-	@echo " $(RM) -r $(BUILDDIR) $(TARGET)"; $(RM) -r $(BUILDDIR) $(TARGET)
+	@echo " $(RM) -r $(BUILDDIR)"; $(RM) -r $(BUILDDIR)
+	@echo " $(RM) $(TARGET)"; $(RM) $(TARGET)
+	@echo " $(RM) -r $(DOCSDIR)/html"; $(RM) -r $(DOCSDIR)/html
+
+docs:
+	@doxygen $(DOCSDIR)/Doxyfile
+	@xdg-open $(DOCSDIR)/html/index.html
 
 .PHONY: clean
 
