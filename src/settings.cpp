@@ -29,7 +29,7 @@
 config settings;
 
 config::config() {
-	config_file_path = "$HOME/.midicontrolrc";
+	config_file_path = std::string(getenv("HOME")) + "/.midicontrolrc";
 	midi_device = "";
 }
 
