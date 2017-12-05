@@ -264,3 +264,4 @@ namespace prog_settings {
 	bool verbose = false;
 	unsigned int delay = 50;
 }
+/* vim: set ts=8 sw=8 tw=0 noet :*/

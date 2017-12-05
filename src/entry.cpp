@@ -76,3 +76,4 @@ std::string Entry::get_note() const {
 	}
 	return ostream.str();
 }
+/* vim: set ts=8 sw=8 tw=0 noet :*/

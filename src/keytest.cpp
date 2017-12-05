@@ -483,3 +483,4 @@ std::string note_replace(std::string s, unsigned int note) {
 			s = boost::regex_replace(s, boost::regex("\\\\NOTE", boost::regex::perl), "NOTE");
 			return s;
 }
+/* vim: set ts=8 sw=8 tw=0 noet :*/

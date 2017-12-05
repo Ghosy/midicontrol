@@ -65,3 +65,4 @@ void light_state_check();
 std::string note_replace(std::string s, unsigned int note);
 
 #endif
+/* vim: set ts=8 sw=8 tw=0 noet :*/
