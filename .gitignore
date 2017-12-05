@@ -1,5 +1,4 @@
 build
-bin/*
 doc/*
 !doc/Doxyfile
 !doc/midicontrol.1
