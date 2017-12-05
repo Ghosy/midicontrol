@@ -1,4 +1,4 @@
-device = Launchpad
+device = Launchpad:Launchpad MIDI 1
 	144,0,127 = mpc -q prev, light_push, 60
 	144,1,127 = mpc -q toggle, light_check, 60, mpc | grep -q "\[playing\]"
 	144,2,127 = mpc -q next, light_push, 60
