@@ -29,7 +29,7 @@
 config settings;
 
 config::config() {
-	config_file_path = "keyconf";
+	config_file_path = "$HOME/.midicontrolrc";
 	midi_device = "";
 }
 
