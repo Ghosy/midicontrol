@@ -38,6 +38,7 @@ private:
 	std::string midi_device;
 	std::string trim(std::string);
 	std::pair<std::vector<unsigned char>, std::vector<unsigned char>> read_note(const std::string);
+	unsigned int stoi_check(const std::string&);
 };
 
 extern config settings;

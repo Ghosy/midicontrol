@@ -82,11 +82,11 @@ void config::read() {
 					// Find correct light mode
 					if(entry_list[1] == "light_push") {
 						new_mode = LightMode::LIGHT_PUSH;
-						new_light_value = stoi(entry_list[2]);
+						new_light_value = stoi_check(entry_list[2]);
 					}
 					else if(entry_list[1] == "light_on") {
 						new_mode = LightMode::LIGHT_ON;
-						new_light_value = stoi(entry_list[2]);
+						new_light_value = stoi_check(entry_list[2]);
 					}
 					else if(entry_list[1] == "light_off") {
 						new_mode = LightMode::LIGHT_OFF;
@@ -94,11 +94,11 @@ void config::read() {
 					}
 					else if(entry_list[1] == "light_wait") {
 						new_mode = LightMode::LIGHT_WAIT;
-						new_light_value = stoi(entry_list[2]);
+						new_light_value = stoi_check(entry_list[2]);
 					}
 					else if(entry_list[1] == "light_check") {
 						new_mode = LightMode::LIGHT_CHECK;
-						new_light_value = stoi(entry_list[2]);
+						new_light_value = stoi_check(entry_list[2]);
 						new_light_command = entry_list[3];
 					}
 					else if(entry_list[1] == "light_var") {
@@ -222,8 +222,8 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 		int breakpos = temp.find("..");
 		// If string contains ".."
 		if(breakpos != -1) {
-			int low = stoi(temp.substr(0, breakpos));
-			int high = stoi(temp.substr(breakpos + 2));
+			int low = stoi_check(temp.substr(0, breakpos));
+			int high = stoi_check(temp.substr(breakpos + 2));
 
 			if(prog_settings::silent) {
 				// Check for invalid values
@@ -240,7 +240,7 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 		}
 		// If string doesn't contain ".."
 		else {
-			int val = stoi(temp);
+			int val = stoi_check(temp);
 			if(prog_settings::silent) {
 				// Check for invalid value
 				if(val > 255 || val < 0) {
@@ -253,6 +253,21 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 		}
 	}
 	return make_pair(lows, highs);
+}
+
+unsigned int config::stoi_check(const std::string& s) {
+	try {
+		return std::stoi(s);
+	}
+	catch(std::invalid_argument& e) {
+		std::cerr << s << " is not a valid value" << '\n';
+		std::cerr << "returning 0 instead" << '\n';
+	}
+	catch(std::out_of_range& e) {
+		std::cerr << s << " is not with range" << '\n';
+		std::cerr << "returning 0 instead" << '\n';
+	}
+	return 0;
 }
 
 // I swear to god if these names aren't fix to be
