@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
 				settings.commandline_config(argv[i]);
 			}
 			else {
-				std::cerr << "No Configuration file was specified." << std::endl;
+				std::cerr << "No Configuration file was specified." << '\n';
 			}
 		}
 		else if((arg == "-d") || (arg == "--delay")) {
@@ -60,16 +60,16 @@ int main(int argc, char* argv[]) {
 						prog_settings::delay = delay;
 					}
 					else {
-						std::cerr << "The delay specified must be greater than 0" << std::endl;
+						std::cerr << "The delay specified must be greater than 0" << '\n';
 					}
 				}
 				catch(...) {
-					std::cerr << argv[i] << " is not a valid value for delay" << std::endl;
+					std::cerr << argv[i] << " is not a valid value for delay" << '\n';
 					exit(EXIT_FAILURE);
 				}
 			}
 			else {
-				std::cerr << "No delay was specified." << std::endl;
+				std::cerr << "No delay was specified." << '\n';
 			}
 		}
 		else if((arg == "-h") || (arg == "--help")) {
@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
 				return 0;
 			}
 			else {
-				std::cerr << "No input device was specified." << std::endl;
+				std::cerr << "No input device was specified." << '\n';
 			}
 		}
 		else if((arg == "-l") || (arg == "--list")) {
@@ -140,7 +140,7 @@ void scan_ports() {
 
 	// Check to ensure a port was opened
 	if(!midiin->isPortOpen()) {
-		std::cerr << "Failed to open device \"" << settings.getDevice() << "\"" << std::endl;
+		std::cerr << "Failed to open device \"" << settings.getDevice() << "\"" << '\n';
 		exit(EXIT_FAILURE);
 	}
 	// Set callback function
@@ -253,7 +253,7 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 				default: {
 					// Print error non conforming light_mode
 					if(!prog_settings::silent)
-						std::cerr << "Non-conforming light_mode found for note, " << it->get_note() << std::endl;
+						std::cerr << "Non-conforming light_mode found for note, " << it->get_note() << '\n';
 					break;
 				}
 			}
@@ -361,7 +361,7 @@ void input_scan(std::string device) {
 
 	// Check to ensure a port was opened
 	if(!midiin->isPortOpen()) {
-		std::cerr << "Failed to open device \"" << device << "\"" << std::endl;
+		std::cerr << "Failed to open device \"" << device << "\"" << '\n';
 		exit(EXIT_FAILURE);
 	}
 	// Set callback function
@@ -444,7 +444,7 @@ void light_state_check() {
 				}
 				// Command exited with neither 1 nor 0
 				else {
-					std::cerr << "Unexpected return for light check on " << e.get_note() << std::endl;
+					std::cerr << "Unexpected return for light check on " << e.get_note() << '\n';
 				}
 
 			}

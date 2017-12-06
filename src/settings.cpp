@@ -110,16 +110,16 @@ void config::read() {
 						// Print error light_mode not valid
 						Entry err_entry(lows, highs, "");
 						if(!prog_settings::silent) {
-							std::cerr << "the light_mode is invalid for " << err_entry.get_note() << std::endl;
-							std::cerr << entry_list[1] << " is not a valid value for light_mode" << std::endl;
+							std::cerr << "the light_mode is invalid for " << err_entry.get_note() << '\n';
+							std::cerr << entry_list[1] << " is not a valid value for light_mode" << '\n';
 						}
 					}
 					// Warn if light value not in range
 					if(new_light_value > 255) {
 						if(!prog_settings::silent) {
 							Entry err_entry(lows, highs, "");
-							std::cerr << "the light_value is invalid for " << err_entry.get_note() << std::endl;
-							std::cerr << new_light_value << " is not a valid light value" << std::endl;
+							std::cerr << "the light_value is invalid for " << err_entry.get_note() << '\n';
+							std::cerr << new_light_value << " is not a valid light value" << '\n';
 						}
 					}
 
@@ -178,7 +178,7 @@ void config::read() {
 							// Use light_on instead of light_push
 							// TODO: Make more verbose
 							if(prog_settings::silent)
-								std::cerr << "Light_mode set incorrectly, don't use a light_mode on note off of note using light_push" << std::endl;
+								std::cerr << "Light_mode set incorrectly, don't use a light_mode on note off of note using light_push" << '\n';
 						}
 
 						next_ready = j + 1;
@@ -228,10 +228,10 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 			if(prog_settings::silent) {
 				// Check for invalid values
 				if(low > 255 || low < 0) {
-					std::cerr << low << " is not a valid value for a note" << std::endl;
+					std::cerr << low << " is not a valid value for a note" << '\n';
 				}
 				if( high > 255 || high < 0) {
-					std::cerr << high << " is not a valid value for a note" << std::endl;
+					std::cerr << high << " is not a valid value for a note" << '\n';
 				}
 			}
 
@@ -244,7 +244,7 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 			if(prog_settings::silent) {
 				// Check for invalid value
 				if(val > 255 || val < 0) {
-					std::cerr << val << " is not a valid value for a note" << std::endl;
+					std::cerr << val << " is not a valid value for a note" << '\n';
 				}
 			}
 
