@@ -478,6 +478,9 @@ void light_state_check() {
 			// wait for delay time
 			usleep(prog_settings::delay * 1000);
 		}
+		if(done) {
+			exit(EXIT_SUCCESS);
+		}
 	}
 }
 
