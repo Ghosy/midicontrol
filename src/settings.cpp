@@ -35,7 +35,7 @@ config::config() {
 
 void config::read() {
 	if(prog_settings::verbose) {
-		std::cout << "Reading File: " << config_file_path << std::endl;
+		std::cout << "Reading File: " << config_file_path << '\n';
 	}
 	std::ifstream f(config_file_path.c_str());
 	std::string line, name, value;

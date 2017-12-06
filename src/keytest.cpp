@@ -301,7 +301,7 @@ void list_ports() {
 			error.printMessage();
 			goto cleanup;
 		}
-		std::cout << "  Input Port #" << i << ": " << portName << std::endl;
+		std::cout << "  Input Port #" << i << ": " << portName << '\n';
 	}
 	// RtMidiOut initialization
 	try {
@@ -322,9 +322,9 @@ void list_ports() {
 			error.printMessage();
 			goto cleanup;
 		}
-		std::cout << "  Output Port #" << i << ": " << portName << std::endl;
+		std::cout << "  Output Port #" << i << ": " << portName << '\n';
 	}
-	std::cout << std::endl;
+	std::cout << '\n';
 	// Clean up
 cleanup:
 	delete midiin;
