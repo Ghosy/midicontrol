@@ -22,7 +22,7 @@ midicontrol \- interpret midi commands into shell commands
 .BR midicontrol " [\fIOPTION\fP]"
 .SH DESCRIPTION
 .B midicontrol
-is program, which takes input from midi controllers and executes a corresponding command based on a user-provided configuration file. If supported by the midi controller,
+is a program, which takes input from midi controllers and executes a corresponding command based on a user-provided configuration file. If supported by the midi controller,
 .B midicontrol
 can also change light settings, based on multiple light modes.
 .SH OPTIONS
@@ -47,7 +47,7 @@ List midi input/output ports
 Suppress normal output when reading midi input
 .TP
 .BR \-s ", " \-\-silent
-Supress normal ouput and suppress errors
+Supress normal output and suppress errors
 .TP
 .BR \-v ", " \-\-verbose
 Print extra information during reading input
@@ -72,7 +72,7 @@ MIDI_NOTE \fB=\fP COMMAND[, LIGHT_MODE[, LIGHT_OPTION]...]
 The MIDI_NOTE is the value of the midi note, from the specified device, which will trigger the corresponding command. The format of each note is 3 values seperated by commas, which can range from 0-255.
 .TP
 .B COMMAND
-The COMMAND is the value that will be run when the corresponding midi note is given by the device specified in the configuration file.
+The COMMAND is the value that will be run when the corresponding note is received. The corresponding note is specified in the configuration file.
 
 Example: mpc -q toggle
 .TP
