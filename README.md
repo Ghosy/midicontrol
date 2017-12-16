@@ -1,7 +1,7 @@
 # Midicontrol
 A simple program to interpret midi notes and run corresponding shell commands
 
-##Building
+## Building
 
 1. Clone or download contents of git repository  
 `git clone https://github.com/Ghosy/midicontrol.git`
@@ -15,12 +15,12 @@ A simple program to interpret midi notes and run corresponding shell commands
 4. Run midicontrol  
 `bin/midicontrol`
 
-##Configuration
+## Configuration
 
 Location: ~/.midicontrolrc or ~/.config/midicontrol/midicontrolrc
 
 Example configuration:
-`
+```
 device = Launchpad  
 144,0,127 = mpc -q prev, light_push, 60  
 144,1,127 = mpc -q toggle, light_check, 60, mpc | grep -q "\\[playing\\]"  
@@ -40,4 +40,4 @@ device = Launchpad
 144,23,127 = mpc -q clear && mpc -q load VPR >> /dev/null  
 144,24,127 = mpc -q clear  
 144,39,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/JeopardyTheme.wav, light_wait, 60  
-`
+```
