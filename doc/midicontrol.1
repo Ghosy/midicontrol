@@ -64,6 +64,11 @@ override
 This file is the configuration file loaded by default when
 .B midicontrol
 starts in normal mode. The program specifies what device the configuration will be run on and the rules for handling incoming midi notes from the specified device.
+.SS Device Configuration
+\fBdevice =\fP DEVICE_NAME
+.TP
+.B DEVICE_NAME
+The DEVICE_NAME is the name of the device the configuration file's rules apply to.
 .SS Command Format
 MIDI_NOTE \fB=\fP COMMAND[, LIGHT_MODE[, LIGHT_OPTION]...]
 .RS
