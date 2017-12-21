@@ -41,3 +41,6 @@ device = Launchpad
 144,24,127 = mpc -q clear  
 144,39,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/JeopardyTheme.wav, light_wait, 60  
 ```
+
+## License
+This project is licensed under the GNU General Public License version 3(GPLv3) - see the [LICENSE.txt](LICENSE.txt) file for details.
