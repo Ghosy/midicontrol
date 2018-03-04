@@ -83,6 +83,7 @@ int main(int argc, char* argv[]) {
 			}
 			else {
 				std::cerr << "No input device was specified." << '\n';
+				exit(EXIT_FAILURE);
 			}
 		}
 		else if((arg == "-l") || (arg == "--list")) {
