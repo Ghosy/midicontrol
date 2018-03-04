@@ -74,12 +74,12 @@ int main(int argc, char* argv[]) {
 		}
 		else if((arg == "-h") || (arg == "--help")) {
 			show_usage();
-			return 0;
+			exit(EXIT_SUCCESS);
 		}
 		else if((arg == "-i") || (arg == "--input")) {
 			if(++i < argc) {
 				input_scan(argv[i]);
-				return 0;
+				exit(EXIT_SUCCESS);
 			}
 			else {
 				std::cerr << "No input device was specified." << '\n';
@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
 		}
 		else if((arg == "-l") || (arg == "--list")) {
 			list_ports();
-			return 0;
+			exit(EXIT_SUCCESS);
 		}
 		else if((arg == "-q") || (arg == "--quiet")) {
 			prog_settings::quiet = true;
@@ -101,11 +101,11 @@ int main(int argc, char* argv[]) {
 		// If the argument is not supported show_usage
 		else {
 			show_usage();
-			return 0;
+			exit(EXIT_SUCCESS);
 		}
 	}
 	scan_ports();
-	return 0;
+	exit(EXIT_SUCCESS);
 }
 
 void scan_ports() {
