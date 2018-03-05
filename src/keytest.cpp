@@ -168,14 +168,17 @@ cleanup:
 
 void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
 	Entry temp_entry(*note_raw, *note_raw, "");
-	auto it = settings.note_list.find(temp_entry);
 
 	if(prog_settings::verbose) {
 		std::cout << "Incoming note: " << temp_entry.get_note() << std::endl;
 	}
 
-	// If note is found in look up table
-	if(it != settings.note_list.end()) {
+	// Find matches to incoming note
+	std::vector<Entry> matches;
+	std::copy_if(settings.note_list.begin(), settings.note_list.end(), std::back_inserter(matches), [note_raw](Entry e){return e.contains(*note_raw);});
+
+	// For each matching note in conf
+	for(auto match: matches) {
 		// Ensure all children are reaped
 		signal(SIGCHLD, SIG_IGN);
 		// Fork for command to be run
@@ -189,10 +192,10 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 				dup2(fd, 1);
 			}
 			if(prog_settings::verbose) {
-				std::cout << "Note: " << temp_entry.get_note() << "\nExecuting: " << it->action << std::endl;
+				std::cout << "Note: " << temp_entry.get_note() << "\nExecuting: " << match.action << std::endl;
 			}
 			// TODO: Should this be hardcoded with min[2]?
-			std::string command = note_replace(it->action, (int)temp_entry.min[2]);
+			std::string command = note_replace(match.action, (int)temp_entry.min[2]);
 
 			// Do the action associated with the corresponding midi note
 			execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
@@ -200,13 +203,13 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 		}
 
 		// Led handling
-		if(it->light_mode != LightMode::NONE) {
+		if(match.light_mode != LightMode::NONE) {
 			std::vector<unsigned char> message;
 
-			switch(it->light_mode) {
+			switch(match.light_mode) {
 				case LightMode::LIGHT_ON:
 				case LightMode::LIGHT_PUSH: {
-					note_send((int)note_raw->at(1), it->light_value);
+					note_send((int)note_raw->at(1), match.light_value);
 					break;
 				}
 				case LightMode::LIGHT_OFF: {
@@ -214,7 +217,7 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 					break;
 				}
 				case LightMode::LIGHT_WAIT: {
-					note_send((int)note_raw->at(1), it->light_value);
+					note_send((int)note_raw->at(1), match.light_value);
 
 					// Fork and wait for child executing command to exit
 					pid_t pid_light = fork();
@@ -243,7 +246,7 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 				default: {
 					// Print error non conforming light_mode
 					if(!prog_settings::silent)
-						std::cerr << "Non-conforming light_mode found for note, " << it->get_note() << '\n';
+						std::cerr << "Non-conforming light_mode found for note, " << match.get_note() << '\n';
 					break;
 				}
 			}
