@@ -24,6 +24,7 @@
 #include <signal.h>
 #include <sstream>
 #include <string>
+#include <sys/prctl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -397,9 +398,8 @@ void light_state_check() {
 		perror("Fork failed");
 	}
 	if(pid_checker == 0) {
-		// Install an interrupt handler function.
-		(void) signal(SIGINT, finish);
-		// Ensures this child exits when the rest of the program does
+		// Ensure child exits upon parent death
+		prctl(PR_SET_PDEATHSIG, SIGHUP);
 		while(!done) {
 			for(auto e: check_list) {
 				int ret;
