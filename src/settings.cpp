@@ -18,10 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <fstream>
+#include <algorithm>
 #include <iostream>
-#include <sstream>
+#include <string>
 #include <vector>
+#include <yaml-cpp/yaml.h>
 
 #include "entry.h"
 #include "settings.h"
@@ -37,101 +38,98 @@ void config::read() {
 	if(prog_settings::verbose) {
 		std::cout << "Reading File: " << config_file_path << '\n';
 	}
-	std::ifstream f(config_file_path.c_str());
-	std::string line, name, value;
 
-	if(!f.is_open())
-		return;
+	YAML::Node config = YAML::LoadFile(config_file_path);
 
-	while(!f.eof()) {
-		getline(f, line);
+	// If no valid devices in config
+	if(!config["devices"].IsSequence() && !config["devices"] && !prog_settings::silent) {
+		std::cerr << "No valid devices found in configuration file\n";
+		exit(EXIT_FAILURE);
+	}
 
-		if(!line.empty() && line[0] != '#') {
-			int pos;
-			pos = line.find("=");
+	// Each device in config
+	for(YAML::Node device: config["devices"]) {
+		midi_device = device["device"].as<std::string>();
 
-			name = trim(line.substr(0, pos));
-			value = trim(line.substr(pos + 1, line.length() - pos));
+		// If no valid notes for device
+		if(!device["notes"].IsSequence() && !device["notes"] && !prog_settings::silent) {
+			std::cerr << "No valid notes found for " << device["device"] << "\n";
+			exit(EXIT_FAILURE);
+		}
 
-			if(name == "device") {
-				midi_device = value;
-			}
-			else {
-				std::string temp;
-				char delim = ',';
+		// Each note for device
+		for(YAML::Node note: device["notes"]) {
+			Entry new_entry;
 
-				// Break up note and place into vectors
-				auto vals = config::read_note(name);
-				std::vector<unsigned char> lows = vals.first;
-				std::vector<unsigned char> highs = vals.second;
+			// Break up note and place into vectors
+			auto vals = config::read_note(note["note"].as<std::string>());
+			std::vector<unsigned char> lows = vals.first;
+			std::vector<unsigned char> highs = vals.second;
 
-				//TODO: Break this section into separate function for readability
-				// Break up after =
-				std::vector<std::string> entry_list;
-				std::stringstream ss(value);
-				while(getline(ss, temp, delim))
-					entry_list.push_back(trim(temp));
+			std::string new_command = note["command"].as<std::string>();
 
-				Entry new_entry;
-				// If there are light settings
-				if(entry_list.size() >= 2) {
-					LightMode new_mode;
-					unsigned int new_light_value;
-					std::string new_light_command = "";
+			// If there are light settings
+			if(note["light_mode"]) {
+				LightMode new_mode;
+				unsigned int new_light_value;
+				std::string new_light_command = "";
 
-					// Find correct light mode
-					if(entry_list[1] == "light_push") {
-						new_mode = LightMode::LIGHT_PUSH;
-						new_light_value = stoi_check(entry_list[2]);
-					}
-					else if(entry_list[1] == "light_on") {
-						new_mode = LightMode::LIGHT_ON;
-						new_light_value = stoi_check(entry_list[2]);
-					}
-					else if(entry_list[1] == "light_off") {
-						new_mode = LightMode::LIGHT_OFF;
-						new_light_value = 0;
-					}
-					else if(entry_list[1] == "light_wait") {
-						new_mode = LightMode::LIGHT_WAIT;
-						new_light_value = stoi_check(entry_list[2]);
-					}
-					else if(entry_list[1] == "light_check") {
-						new_mode = LightMode::LIGHT_CHECK;
-						new_light_value = stoi_check(entry_list[2]);
-						new_light_command = entry_list[3];
-					}
-					else if(entry_list[1] == "light_var") {
-						new_mode = LightMode::LIGHT_VAR;
-						new_light_value = 0;
-						new_light_command = entry_list[2];
-					}
-					else {
-						// Print error light_mode not valid
-						Entry err_entry(lows, highs, "");
-						if(!prog_settings::silent) {
-							std::cerr << "the light_mode is invalid for " << err_entry.get_note() << '\n';
-							std::cerr << entry_list[1] << " is not a valid value for light_mode" << '\n';
-						}
-					}
-					// Warn if light value not in range
-					if(new_light_value > 255) {
-						if(!prog_settings::silent) {
-							Entry err_entry(lows, highs, "");
-							std::cerr << "the light_value is invalid for " << err_entry.get_note() << '\n';
-							std::cerr << new_light_value << " is not a valid light value" << '\n';
-						}
-					}
+				std::string temp_mode = note["light_mode"].as<std::string>();
+				// To lower temp_mode
+				transform(temp_mode.begin(), temp_mode.end(), temp_mode.begin(), ::tolower);
 
-					new_entry = Entry(lows, highs, entry_list[0], new_mode, (char)new_light_value, new_light_command);
+				// Find correct light mode
+				if(temp_mode == "light_push") {
+					new_mode = LightMode::LIGHT_PUSH;
+					new_light_value = note["light_value"].as<unsigned int>();
+				}
+				else if(temp_mode == "light_on") {
+					new_mode = LightMode::LIGHT_ON;
+					new_light_value = note["light_value"].as<unsigned int>();
+				}
+				else if(temp_mode == "light_off") {
+					new_mode = LightMode::LIGHT_OFF;
+					new_light_value = 0;
+				}
+				else if(temp_mode == "light_wait") {
+					new_mode = LightMode::LIGHT_WAIT;
+					new_light_value = note["light_value"].as<unsigned int>();
+				}
+				else if(temp_mode == "light_check") {
+					new_mode = LightMode::LIGHT_CHECK;
+					new_light_value = note["light_value"].as<unsigned int>();
+					new_light_command = note["light_command"].as<std::string>();
+				}
+				else if(temp_mode == "light_var") {
+					new_mode = LightMode::LIGHT_VAR;
+					new_light_value = 0;
+					new_light_command = note["light_command"].as<std::string>();
 				}
 				else {
-					new_entry = Entry(lows, highs, entry_list[0]);
+					// Print error light_mode not valid
+					Entry err_entry(lows, highs, "");
+					if(!prog_settings::silent) {
+						std::cerr << "the light_mode is invalid for " << err_entry.get_note() << '\n';
+						std::cerr << note["light_mode"] << " is not a valid value for light_mode" << '\n';
+					}
+				}
+				// Warn if light value not in range
+				if(new_light_value > 255) {
+					if(!prog_settings::silent) {
+						Entry err_entry(lows, highs, "");
+						std::cerr << "the light_value is invalid for " << err_entry.get_note() << '\n';
+						std::cerr << new_light_value << " is not a valid light value" << '\n';
+					}
 				}
 
-				// Store entry
-				note_list.insert(new_entry);
+				new_entry = Entry(lows, highs, new_command, new_mode, (char)new_light_value, new_light_command);
 			}
+			else {
+				new_entry = Entry(lows, highs, new_command);
+			}
+
+			// Store entry
+			note_list.insert(new_entry);
 		}
 	}
 

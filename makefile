@@ -13,7 +13,7 @@ TARGET := bin/midicontrol
 DOCSDIR := doc
 
 # Libraries linked to exec
-LIBS = -lrtmidi -lboost_regex
+LIBS = -lrtmidi -lboost_regex -lyaml-cpp
 
 # Source extension
 SRCEXT := cpp

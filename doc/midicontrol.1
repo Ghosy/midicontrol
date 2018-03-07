@@ -15,7 +15,7 @@
 .\" You should have received a copy of the GNU General Public License
 .\" along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-.TH MIDICONTROL 1 "03 December 2017" "0.1" "midicontrol man page"
+.TH MIDICONTROL 1 "07 March 2018" "0.1" "midicontrol man page"
 .SH NAME
 midicontrol \- interpret midi commands into shell commands
 .SH SYNOPSIS
@@ -64,13 +64,23 @@ override
 This file is the configuration file loaded by default when
 .B midicontrol
 starts in normal mode. The program specifies what device the configuration will be run on and the rules for handling incoming midi notes from the specified device.
+.SS Configuration Preamble
+.B
+---
+.br
+.B
+devices:
 .SS Device Configuration
-\fBdevice =\fP DEVICE_NAME
+\fB- device:\fP DEVICE_NAME
 .TP
 .B DEVICE_NAME
 The DEVICE_NAME is the name of the device the configuration file's rules apply to.
 .SS Command Format
-MIDI_NOTE \fB=\fP COMMAND[, LIGHT_MODE[, LIGHT_OPTION]...]
+\fB- note:\fP MIDI_NOTE
+\fB  command:\fP COMMAND
+ [\fBlight_mode:\fP LIGHT_MODE]
+ [\fBlight_value:\fP LIGHT_VALUE]
+ [\fBlight_command:\fP LIGHT_COMMAND]
 .RS
 .TP
 .B MIDI_NOTE
@@ -103,70 +113,96 @@ light_var
 Change light level based on value output by light_command
 .RE
 .TP
-.B LIGHT_OPTIONS
+.B LIGHT_VALUES
 .RS
-Light options are additional information used by the different LIGHT_MODES. The amount of options needed by each LIGHT_MODE varies and is specified in parentheses next to each LIGHT_MODE in the list below. Under each LIGHT_MODE is the different options that are required. The order of the options must be as labeled for the LIGHT_MODE to function properly. The two options that may be present are light_value and light_command. Light_value must be a value from 0 to 255. Light_command must be a valid command on the system \fBmidicontrol\fP is running on.
+Light_values give the value to be sent to the midi controller for the light level. This may change from device to device and you should consult your midi controller's manual to find the proper values. LIGHT_VALUE can range from 0 to 255. Some light_modes will require a light value, while others will not.
 .TP
-light_push (1)
-\fB1.\fP light_value
+light_push
+Requires a light_value
 .TP
-light_on (1)
-\fB1.\fP light_value
+light_on
+Requires a light_value
 .TP
-light_off (0)
-No LIGHT_OPTIONS apply to light_off
+light_off
+Does not require a light_value
 .TP
-light_wait (1)
-\fB1.\fP light_command
+light_wait
+Requires a light_value
 .TP
-light_check (2)
-\fB1.\fP light_value
-\fB2.\fP light_command
+light_check
+Requires a light_value
 .TP
-light_var (1)
-\fB1.\fP light_command
+light_var
+Does not require a light_value
+.RE
+.TP
+.B LIGHT_COMMANDS
+.RS
+Light_commands provide additional information that some light_modes need to be able to function properly. Not all light_modes require a light_command. Light_command must be a valid command on the system \fBmidicontrol\fP is running on.
+.TP
+light_push
+Does not require a light_command
+.TP
+light_on
+Does not require a light_command
+.TP
+light_off
+Does not require a light_command
+.TP
+light_wait
+Does not require a light_command
+.TP
+light_check
+Requires a light_command
+.TP
+light_var
+Requires a light_command
 .RE
 .RE
 .SS Sample Configuration
 .TP
-device = Launchpad
-.RS
-144,0,127 = mpc -q prev, light_push, 60
+---
 .br
-144,1,127 = mpc -q toggle, light_check, 60, mpc | grep -q "\\[playing\\]"
+.in 7
+devices:
 .br
-144,2,127 = mpc -q next, light_push, 60
+- device: Launchpad:Launchpad MIDI 1
+.in 9
+notes:
 .br
-144,3,127 = mpc -q volume -5, light_push, 60
+- note: '144,0,127'
+.in 11
+command: mpc -q prev
 .br
-144,4,127 = mpc -q volume +5, light_push, 60
+light_mode: LIGHT_PUSH
 .br
-144,5,127 = mpc -q repeat, light_check, 60, mpc | grep -q "repeat: on"
+light_value: 60
+.in 9
+- note: '144,1,127'
+.in 11
+command: mpc -q toggle
 .br
-144,6,127 = mpc -q single, light_check, 60, mpc | grep -q "single: on"
+light_mode: LIGHT_CHECK
 .br
-144,7,127 = mpc -q random, light_check, 60, mpc | grep -q "random: on"
+light_value: 60
 .br
-144,16,127 = mpc -q clear && mpc -q load Reflections\ in\ Sand >> /dev/null
+light_command: 'mpc | grep -q "\\[playing\\]"'
+.in 9
+- note: '144,2,127'
+.in 11
+command: mpc -q next
 .br
-144,17,127 = mpc -q clear && mpc -q load Noble\ Beast >> /dev/null
+light_mode: LIGHT_PUSH
 .br
-144,18,127 = mpc -q clear && mpc -q load Break\ From\ This\ World >> /dev/null
+light_value: 60
+.in 9
+- note: '144,39,127'
+.in 11
+command:\ ~/projects/soundboard/soundboard.sh\ -c\ -f\ ~/projects/soundboard/clips/JeopardyTheme.wav
 .br
-144,19,127 = mpc -q clear && mpc -q load Transistor\ OST >> /dev/null
+light_mode: LIGHT_WAIT
 .br
-144,20,127 = mpc -q clear && mpc -q load Stan\ SB >> /dev/null
-.br
-144,21,127 = mpc -q clear && mpc -q load PPPPPP >> /dev/null
-.br
-144,22,127 = mpc -q clear && mpc -q load A\ Prague\ Spring >> /dev/null
-.br
-144,23,127 = mpc -q clear && mpc -q load VPR >> /dev/null
-.br
-144,24,127 = mpc -q clear
-.br
-144,39,127 = ~/projects/soundboard/soundboard.sh -c -f ~/projects/soundboard/clips/JeopardyTheme.wav, light_wait, 60
-.RE
+light_value: 60
 .SH BUGS
 No known bugs.
 .SH AUTHOR
