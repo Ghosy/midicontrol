@@ -173,10 +173,8 @@ void config::read() {
 						}
 						else {
 							// Print error light_mode used incorrectly
-							// Use light_on instead of light_push
-							// TODO: Make more verbose
-							if(prog_settings::silent)
-								std::cerr << "Light_mode set incorrectly, don't use a light_mode on note off of note using light_push" << '\n';
+							if(!prog_settings::silent)
+								std::cerr << it_find->get_note() << " has a light mode with a corresponding note on, which has light_push" << '\n' << it_find->get_note() << " should not have a light_mode, if using light_push on a corresponding note" << '\n';
 						}
 
 						next_ready = j + 1;
