@@ -221,7 +221,7 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 			int low = stoi_check(temp.substr(0, breakpos));
 			int high = stoi_check(temp.substr(breakpos + 2));
 
-			if(prog_settings::silent) {
+			if(!prog_settings::silent) {
 				// Check for invalid values
 				if(low > 255 || low < 0) {
 					std::cerr << low << " is not a valid value for a note" << '\n';
@@ -237,7 +237,7 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 		// If string doesn't contain ".."
 		else {
 			int val = stoi_check(temp);
-			if(prog_settings::silent) {
+			if(!prog_settings::silent) {
 				// Check for invalid value
 				if(val > 255 || val < 0) {
 					std::cerr << val << " is not a valid value for a note" << '\n';
