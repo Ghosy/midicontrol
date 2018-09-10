@@ -57,38 +57,42 @@ class Entry
 
 		/**
 		 * @brief Create Entry without light settings
-		 * @param lows A vector containing the lower bound of the midi note
-		 * @param highs A vector containing the upper bound of the midi note
+		 * @param new_note A vector containing the values of the midi note
 		 * @param new_action A string containing the corresponding command for the defined midi note
 		 */
-		Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action);
+		Entry(std::vector<unsigned char> new_note, std::string new_action);
 		/**
 		 * @brief Create Entry with light settings
-		 * @param lows A vector containing the lower bound of the midi note
-		 * @param highs A vector containing the upper bound of the midi note
+		 * @param new_note A vector containing the values of the midi note
 		 * @param new_action A string containing the corresponding command for the defined midi note
 		 * @param new_mode A light mode corresponding to the midi note
 		 * @param new_light_value A value between 0-255 indicating the light value
 		 */
-		Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value);
+		Entry(std::vector<unsigned char> new_note, std::string new_action, LightMode new_mode, unsigned char new_light_value);
 
 		/**
 		 * @brief Create Entry with light settings
-		 * @param lows A vector containing the lower bound of the midi note
-		 * @param highs A vector containing the upper bound of the midi note
+		 * @param new_note A vector containing the values of the midi note
 		 * @param new_action A string containing the corresponding command for the defined midi note
 		 * @param new_mode A light mode corresponding to the midi note
 		 * @param new_light_value A value between 0-255 indicating the light value
 		 * @param new_light_command A string containing the corresponding command for LIGHT_CHECK and LIGHT_VAR
 		 */
-		Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value, std::string new_light_command);
+		Entry(std::vector<unsigned char> new_note, std::string new_action, LightMode new_mode, unsigned char new_light_value, std::string new_light_command);
 
 		/**
 		 * @brief Returns true if and only if the Entry contains the specified midi note
-		 * @param note A vector containing the three segments of a midi note
+		 * @param other_note A vector containing the three segments of a midi note
 		 * @return True, if the Entry contains note, false otherwise
 		 */
-		bool contains(const std::vector<unsigned char>& note) const;
+		bool contains(const std::vector<unsigned char>& other_note) const;
+
+		/**
+		 * @brief Returns true if midi notes are equal
+		 * @param other An Entry being compared to the current Entry
+		 * @return True, if current Entry is equal to other Entry
+		 */
+		bool operator==(const Entry& other) const;
 
 		/**
 		 * @brief Returns true if and only if midi note in the Entry is less than other's midi note
@@ -102,6 +106,11 @@ class Entry
 		 * @return String containing human readable midi note (Example: 144,1,1)
 		 */
 		std::string get_note() const;
+
+		/**
+		 * @brief A vector containing the values of the midi note
+		 */
+		std::vector<unsigned char> note;
 
 		/**
 		 * @brief A string containing command associated with Entry's midi note
@@ -122,18 +131,6 @@ class Entry
 		 * @brief A value between 0-255 indicating the light value
 		 */
 		unsigned char light_value;
-
-
-		/**
-		 * @brief An array containing the lower bounds of midi note
-		 */
-		// TODO: Should this really be stored as array or use more useful storage
-		unsigned char min[3];
-
-		/**
-		 * @brief An array containing the upper bounds of midi note
-		 */
-		unsigned char max[3];
 };
 
 #endif

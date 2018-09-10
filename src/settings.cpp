@@ -107,88 +107,95 @@ void config::read() {
 				}
 				else {
 					// Print error light_mode not valid
-					Entry err_entry(lows, highs, "");
 					if(!prog_settings::silent) {
-						std::cerr << "the light_mode is invalid for " << err_entry.get_note() << '\n';
+						std::cerr << "the light_mode is invalid for " << format_note(lows, highs) << '\n';
 						std::cerr << note["light_mode"] << " is not a valid value for light_mode" << '\n';
 					}
 				}
 				// Warn if light value not in range
 				if(new_light_value > 255) {
 					if(!prog_settings::silent) {
-						Entry err_entry(lows, highs, "");
-						std::cerr << "the light_value is invalid for " << err_entry.get_note() << '\n';
+						std::cerr << "the light_value is invalid for " << format_note(lows, highs) << '\n';
 						std::cerr << new_light_value << " is not a valid light value" << '\n';
 					}
 				}
 
-				new_entry = Entry(lows, highs, new_command, new_mode, (char)new_light_value, new_light_command);
+
+				insert_note(lows, highs, new_command, new_mode, (unsigned char)new_light_value, new_light_command);
 			}
 			else {
-				new_entry = Entry(lows, highs, new_command);
+				insert_note(lows, highs, new_command, LightMode::NONE, 0, "");
 			}
-
-			// Store entry
-			note_list.insert(new_entry);
 		}
 	}
 
 	// Look through all entries for LIGHT_PUSH missing LIGHT_OFF
 	// TODO: Try and clean this up. It's a mess
-	// TODO: Maybe reduce using range-based for loop
 	for(auto it = note_list.begin(); it != note_list.end(); ++it) {
 		if(it->light_mode == LightMode::LIGHT_PUSH) {
-			// Sort through xx,00,00 of note
-			for(unsigned char i = it->min[0]; i <= it->max[0]; ++i) {
-				// Store value to begin range at to reduce new entries
-				unsigned char next_ready = it->min[1];
-				// Sort through 00,xx,00 of note
-				for(unsigned char j = it->min[1]; j <= it->max[1]; ++j) {
-					// Try to find midi note off, aka xx,xx,00
-					Entry temp_entry({i,j,0}, {i,j,0}, "");
-					std::set<Entry>::iterator it_find = settings.note_list.find(temp_entry);
+			// Try to find midi note off, aka xx,xx,00
+			Entry off_entry1({it->note[0], it->note[1], 0}, "");
+			// Try to find midi note off, aka xx-16,xx,xx
+			Entry off_entry2({static_cast<unsigned char>(it->note[0] - 16), it->note[1], it->note[2]}, "");
 
-					if(it_find != settings.note_list.end()) {
-						// Create entry for LIGHT_OFF for range before found
-						if(next_ready < j) {
-							std::vector<unsigned char> low{i, next_ready, 0};
-							// TODO: Static cast is done here to avoid warning. Is there a better way?
-							std::vector<unsigned char> high{i, static_cast<unsigned char>(j - 1), 0};
-							Entry new_entry(low, high, "", LightMode::LIGHT_OFF, 0);
-							note_list.insert(new_entry);
-						}
-						// Modify entry for found
-						if(it_find->light_mode == LightMode::NONE) {
-							// Create modified version of found
-							std::vector<unsigned char> low;
-							for(unsigned char a : it->min)
-								low.push_back(a);
-							std::vector<unsigned char> high;
-							for(unsigned char a : it->max)
-								high.push_back(a);
-							Entry new_entry(low, high, it->action, LightMode::LIGHT_OFF, it->light_value);
-							// Remove found and insert modified
-							note_list.erase(it_find);
-							note_list.insert(new_entry);
-						}
-						else {
-							// Print error light_mode used incorrectly
-							if(!prog_settings::silent)
-								std::cerr << it_find->get_note() << " has a light mode with a corresponding note on, which has light_push" << '\n' << it_find->get_note() << " should not have a light_mode, if using light_push on a corresponding note" << '\n';
-						}
+			std::vector<Entry> off_entries = {off_entry1, off_entry2};
 
-						next_ready = j + 1;
+			for(unsigned int i = 0; i < off_entries.size(); ++i) {
+				std::set<Entry>::iterator it_find = settings.note_list.find(off_entries[i]);
+
+				if(it_find != settings.note_list.end()) {
+					// Modify entry for found
+					if(it_find->light_mode == LightMode::NONE) {
+						std::vector<unsigned char> temp_note = it_find->note;
+						// Create modified version of found
+						Entry new_entry(temp_note, it_find->action, LightMode::LIGHT_OFF, (unsigned char)0);
+						// Remove found and insert modified
+						note_list.erase(it_find);
+						note_list.insert(new_entry);
+					}
+					else {
+						// Print error light_mode used incorrectly
+						if(!prog_settings::silent)
+							std::cerr << it_find->get_note() << " has a light mode with a corresponding note on, which has light_push" << '\n' << it_find->get_note() << " should not have a light_mode, if using light_push on a corresponding note" << '\n';
 					}
 				}
-				if(next_ready == it->min[1]) {
-					std::vector<unsigned char> low{i, next_ready, 0};
-					std::vector<unsigned char> high{i, it->max[1], 0};
-					Entry new_entry(low, high, "", LightMode::LIGHT_OFF, 0);
+				else {
+					Entry new_entry(off_entries[i].note, "", LightMode::LIGHT_OFF, (unsigned char)0);
 					note_list.insert(new_entry);
 				}
 			}
 		}
 	}
+}
+
+void config::insert_note(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string action, LightMode mode, unsigned int light_value, std::string light_command) {
+	Entry new_entry;
+	for(unsigned char i = lows[0]; i <= highs[0]; ++i) {
+		for(unsigned char j = lows[1]; j <= highs[1]; ++j) {
+			for(unsigned char k = lows[2]; k <= highs[2]; ++k) {
+				new_entry = Entry({i, j, k}, action, mode, (char)light_value, light_command);
+				// Store entry
+				note_list.insert(new_entry);
+			}
+		}
+	}
+}
+
+std::string config::format_note(std::vector<unsigned char> lows, std::vector<unsigned char> highs) {
+	std::ostringstream ostream;
+
+	for(int i = 0; i < 3; ++i) {
+		if(lows[i] == highs[i]) {
+			ostream << (int)lows[i];
+		}
+		else {
+			ostream << (int)lows[i] << ".." << (int)highs[i];
+		}
+		if(i < 2) {
+			ostream << ",";
+		}
+	}
+	return ostream.str();
 }
 
 void config::commandline_config(const char* conf_path) {

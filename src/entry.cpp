@@ -27,26 +27,31 @@
 Entry::Entry() {
 }
 
-Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action)
-	: Entry::Entry(lows, highs, new_action, LightMode::NONE, 0, "") {}
+Entry::Entry(std::vector<unsigned char> new_note, std::string new_action)
+	: Entry::Entry(new_note, new_action, LightMode::NONE, 0, "") {}
 
-Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value)
-	: Entry::Entry(lows, highs, new_action, new_mode, new_light_value, "") {}
+Entry::Entry(std::vector<unsigned char> new_note, std::string new_action, LightMode new_mode, unsigned char new_light_value)
+	: Entry::Entry(new_note, new_action, new_mode, new_light_value, "") {}
 
-Entry::Entry(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string new_action, LightMode new_mode, unsigned char new_light_value, std::string new_light_command)
-	: action(new_action),
+Entry::Entry(std::vector<unsigned char> new_note, std::string new_action, LightMode new_mode, unsigned char new_light_value, std::string new_light_command)
+	: note(new_note),
+	action(new_action),
 	light_mode(new_mode),
 	light_command(new_light_command),
-	light_value(new_light_value) {
-		for(int i = 0; i < 3; ++i) {
-			min[i] = lows[i];
-			max[i] = highs[i];
-		}
-	}
+	light_value(new_light_value) {}
 
-bool Entry::contains(const std::vector<unsigned char>& note) const {
+// TODO: Replace with equality check?
+bool Entry::contains(const std::vector<unsigned char>& other_note) const {
 	for(int i = 0; i < 3; ++i) {
-		if(note[i] < min[i] || note[i] > max[i])
+		if(other_note[i] < note[i] || other_note[i] > note[i])
+			return false;
+	}
+	return true;
+}
+
+bool Entry::operator==(const Entry& other) const {
+	for(int i = 0; i < 3; ++i) {
+		if(other.note[i] != note[i])
 			return false;
 	}
 	return true;
@@ -54,7 +59,7 @@ bool Entry::contains(const std::vector<unsigned char>& note) const {
 
 bool Entry::operator<(const Entry& other) const {
 	for(int i = 0; i < 3; ++i) {
-		if(min[i] < other.min[i] && max[i] < other.max[i])
+		if(note[i] < other.note[i])
 			return true;
 	}
 	return false;
@@ -64,12 +69,7 @@ std::string Entry::get_note() const {
 	std::ostringstream ostream;
 
 	for(int i = 0; i < 3; ++i) {
-		if(min[i] == max[i]) {
-			ostream << (int)min[i];
-		}
-		else {
-			ostream << (int)min[i] << ".." << (int)max[i];
-		}
+		ostream << (int)note[i];
 		if(i < 2) {
 			ostream << ",";
 		}

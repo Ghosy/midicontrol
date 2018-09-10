@@ -168,7 +168,7 @@ cleanup:
 }
 
 void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
-	Entry temp_entry(*note_raw, *note_raw, "");
+	Entry temp_entry(*note_raw, "");
 
 	if(prog_settings::verbose) {
 		std::cout << "Incoming note: " << temp_entry.get_note() << std::endl;
@@ -195,8 +195,8 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 			if(prog_settings::verbose) {
 				std::cout << "Note: " << temp_entry.get_note() << "\nExecuting: " << match.action << std::endl;
 			}
-			// TODO: Should this be hardcoded with min[2]?
-			std::string command = note_replace(match.action, (int)temp_entry.min[2]);
+			// TODO: Should this be hardcoded with note[2]?
+			std::string command = note_replace(match.action, (int)temp_entry.note[2]);
 
 			// Do the action associated with the corresponding midi note
 			execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
@@ -377,7 +377,7 @@ cleanup:
 }
 
 void input_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
-	Entry temp_entry(*note_raw, *note_raw, "");
+	Entry temp_entry(*note_raw, "");
 	// Print note received
 	std::cout << "Note: " << temp_entry.get_note() << std::endl;
 }
@@ -411,13 +411,14 @@ void light_state_check() {
 
 				// Positive response(grep found)
 				if(ret == 0) {
-					// Turn on leds
-					note_range_send(e, e.light_value);
+					// Turn on led
+					// TODO: Fix so that this makes more sense, check function for TODO below
+					note_send(e.note[1], e.light_value);
 				}
 				// Negative response(grep failed to find)
 				else if(ret == 1) {
-					// Turn off leds
-					note_range_send(e, 0);
+					// Turn off led
+					note_send(e.note[1], 0);
 				}
 				// Command exited with neither 1 nor 0
 				else {
@@ -442,7 +443,7 @@ void light_state_check() {
 				}
 				int new_light_value = std::stoi(data);
 
-				note_range_send(e, new_light_value);
+				note_send(e.note[1], new_light_value);
 			}
 			// wait for delay time
 			usleep(prog_settings::delay * 1000);
@@ -462,22 +463,13 @@ std::string note_replace(std::string s, unsigned int note) {
 			return s;
 }
 
+// TODO: Add support for more channel support than channel 1
+// TODO: Should this use entry?
 void note_send(unsigned char data_1, unsigned char data_2) {
 	std::vector<unsigned char> message;
 	message.push_back(144);
 	message.push_back(data_1);
 	message.push_back(data_2);
 	midiout->sendMessage(&message);
-}
-
-void note_range_send(Entry e, unsigned char data_2) {
-	std::vector<unsigned char> message;
-	for(int i = e.min[1]; i <= e.max[1]; ++i) {
-		message.push_back(144);
-		message.push_back(i);
-		message.push_back(data_2);
-		midiout->sendMessage(&message);
-		message.clear();
-	}
 }
 /* vim: set ts=8 sw=8 tw=0 noet :*/

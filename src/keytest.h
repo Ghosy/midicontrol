@@ -71,10 +71,5 @@ std::string note_replace(std::string s, unsigned int note);
  */
 void note_send(unsigned char data_1, unsigned char data_2);
 
-/**
- * @brief Send midi note(s) back to the device in the format of 144, (Entry range), data_2
- */
-void note_range_send(Entry e, unsigned char data_2);
-
 #endif
 /* vim: set ts=8 sw=8 tw=0 noet :*/
