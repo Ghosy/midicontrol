@@ -60,6 +60,19 @@ test: $(OBJS_TEST)
 $(BUILDDIR)/%.o: $(TESTDIR)/%.$(SRCEXT)
 	@echo " $(CC) $(CFLAGS) -c -o $@ $<"; $(CC) $(CFLAGS) -c -o $@ $<
 
+PREFIX := /usr/local
+
+install:
+	# install -d $(DESTDIR)$(PREFIX)/bin/
+	install -Dm 755 $(TARGET) $(DESTDIR)$(PREFIX)/bin/
+	# install -d $(DESTDIR)$(PREFIX)/share/man/man1/
+	install -Dm 644 doc/midicontrol.1 $(DESTDIR)$(PREFIX)/share/man/man1/
+	gzip $(DESTDIR)$(PREFIX)/share/man/man1/midicontrol.1
+
+uninstall:
+	rm $(DESTDIR)$(PREFIX)/bin/midicontrol
+	rm $(DESTDIR)$(PREFIX)/share/man/man1/midicontrol.1.gz
+
 .PHONY: clean
 
 # DO NOT DELETE THIS LINE -- make depend needs it
