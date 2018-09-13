@@ -51,21 +51,30 @@ SRCS_TEST := $(shell find $(TESTDIR) -type f -name *.$(SRCEXT))
 OBJS_TEST := $(filter-out $(BUILDDIR)/keytest.o, $(OBJS))
 # *.o for midicontrol tests
 OBJS_TEST += $(patsubst $(TESTDIR)/%,$(BUILDDIR)/%,$(SRCS_TEST:.$(SRCEXT)=.o))
+# bin file for midicontrol tests
+TARGET_TEST := $(BINDIR)/test
 
-test: $(OBJS_TEST)
+test: $(TARGET_TEST)
+
+$(TARGET_TEST): $(OBJS_TEST)
 	@echo "Linking Test...";
 	@mkdir -p $(BINDIR)
-	@echo " $(CC) $(CFLAGS) $^ -o $(BINDIR)/$@ $(LIBS)"; $(CC) $(CFLAGS) $^ -o $(BINDIR)/$@ $(LIBS)
+	@echo " $(CC) $(CFLAGS) $^ -o $@ $(LIBS)"; $(CC) $(CFLAGS) $^ -o $@ $(LIBS)
 
 $(BUILDDIR)/%.o: $(TESTDIR)/%.$(SRCEXT)
 	@echo " $(CC) $(CFLAGS) -c -o $@ $<"; $(CC) $(CFLAGS) -c -o $@ $<
 
 PREFIX := /usr/local
 
-install:
-	# install -d $(DESTDIR)$(PREFIX)/bin/
+BIN_INSTALL := $(DESTDIR)$(PREFIX)/bin/midicontrol
+MAN_INSTALL := $(DESTDIR)$(PREFIX)/share/man/man1/midicontrol.1.gz
+
+install: $(BIN_INSTALL) $(MAN_INSTALL)
+
+$(BIN_INSTALL):
 	install -Dm 755 $(TARGET) $(DESTDIR)$(PREFIX)/bin/
-	# install -d $(DESTDIR)$(PREFIX)/share/man/man1/
+
+$(MAN_INSTALL):
 	install -Dm 644 doc/midicontrol.1 $(DESTDIR)$(PREFIX)/share/man/man1/
 	gzip $(DESTDIR)$(PREFIX)/share/man/man1/midicontrol.1
 
@@ -73,6 +82,6 @@ uninstall:
 	rm $(DESTDIR)$(PREFIX)/bin/midicontrol
 	rm $(DESTDIR)$(PREFIX)/share/man/man1/midicontrol.1.gz
 
-.PHONY: clean
+.PHONY: clean docs test install uninstall
 
 # DO NOT DELETE THIS LINE -- make depend needs it
