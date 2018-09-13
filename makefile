@@ -1,7 +1,7 @@
 # Compiler
 CC := g++
 # Compile-time flags
-CFLAGS := -std=c++11 -Wall -g3
+CFLAGS := -std=c++11 -pedantic -Wall -Wextra -g3
 
 # Source directory
 SRCDIR := src
