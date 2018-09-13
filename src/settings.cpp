@@ -108,14 +108,14 @@ void config::read() {
 				else {
 					// Print error light_mode not valid
 					if(!prog_settings::silent) {
-						std::cerr << "the light_mode is invalid for " << format_note(lows, highs) << '\n';
+						std::cerr << "The light_mode is invalid for " << format_note(lows, highs) << '\n';
 						std::cerr << note["light_mode"] << " is not a valid value for light_mode" << '\n';
 					}
 				}
 				// Warn if light value not in range
 				if(new_light_value > 255) {
 					if(!prog_settings::silent) {
-						std::cerr << "the light_value is invalid for " << format_note(lows, highs) << '\n';
+						std::cerr << "The light_value is invalid for " << format_note(lows, highs) << '\n';
 						std::cerr << new_light_value << " is not a valid light value" << '\n';
 					}
 				}
