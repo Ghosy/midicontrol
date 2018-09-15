@@ -17,7 +17,7 @@ A simple program to interpret midi notes and run corresponding shell commands
 
 ## Configuration
 
-Location: ~/.midicontrolrc or ~/.config/midicontrol/midicontrolrc
+Location: `~/.midicontrolrc` or `~/.config/midicontrol/midicontrolrc`
 
 The configuration file uses YAML. An example of a configuration file can be found below.
 
