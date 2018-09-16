@@ -34,7 +34,7 @@ struct config {
 	std::string getDevice();
 
 private:
-	std::string config_file_path;
+	std::vector<std::string> config_file_path;
 	std::string midi_device;
 	std::string trim(std::string);
 	void insert_note(std::vector<unsigned char>, std::vector<unsigned char>, std::string, LightMode, unsigned int, std::string);

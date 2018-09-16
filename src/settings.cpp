@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -30,16 +31,48 @@
 config settings;
 
 config::config() {
-	config_file_path = std::string(getenv("HOME")) + "/.midicontrolrc";
+	config_file_path.push_back(std::string(getenv("HOME")) + "/.midicontrolrc");
+	if(getenv("XDG_CONFIG_HOME") == NULL) {
+		config_file_path.push_back(std::string(getenv("HOME")) + "/.config/midicontrol/midicontrolrc");
+	}
+	else {
+		config_file_path.push_back(std::string(getenv("XDG_CONFIG_HOME")) + "/midicontrol/midicontrolrc");
+	}
 	midi_device = "";
 }
 
 void config::read() {
 	if(prog_settings::verbose) {
-		std::cout << "Reading File: " << config_file_path << '\n';
+		std::cout << "Reading Config File:\n";
 	}
 
-	YAML::Node config = YAML::LoadFile(config_file_path);
+	std::string config_file = "";
+	// Check all possible config paths
+	for(unsigned int i = 0; i < config_file_path.size(); ++i) {
+		std::ifstream f(config_file_path[i].c_str());
+		// Check current file
+		if(f.good()) {
+			config_file = config_file_path[i];
+			break;
+		}
+		else {
+			if(prog_settings::verbose) {
+				std::cout << config_file_path[i] << " cannot be read\n";
+			}
+		}
+	}
+	YAML::Node config;
+	
+	// Ensure the file trying to be loaded exists before trying
+	if(!config_file.empty()) {
+		config = YAML::LoadFile(config_file);
+	}
+	else {
+		if(!prog_settings::silent) {
+			std::cerr << "No valid configuration file found\n";
+		}
+		exit(EXIT_FAILURE);
+	}
 
 	// If no valid devices in config
 	if(!config["devices"].IsSequence() && !config["devices"] && !prog_settings::silent) {
@@ -199,7 +232,9 @@ std::string config::format_note(std::vector<unsigned char> lows, std::vector<uns
 }
 
 void config::commandline_config(const char* conf_path) {
-	config_file_path = conf_path;
+	// Remove default configuration paths
+	config_file_path.clear();
+	config_file_path.push_back(conf_path);
 }
 
 std::string config::getDevice() {
