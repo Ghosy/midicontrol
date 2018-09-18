@@ -134,7 +134,7 @@ void scan_ports() {
 		std::string s = midiin->getPortName(i);
 		s = s.substr(0, s.find_last_of(' '));
 
-		if(s == settings.getDevice()) {
+		if(s == settings.get_device()) {
 			midiin->openPort(i);
 			midiout->openPort(i);
 		}
@@ -142,7 +142,7 @@ void scan_ports() {
 
 	// Check to ensure a port was opened
 	if(!midiin->isPortOpen()) {
-		std::cerr << "Failed to open device \"" << settings.getDevice() << "\"" << '\n';
+		std::cerr << "Failed to open device \"" << settings.get_device() << "\"" << '\n';
 		exit(EXIT_FAILURE);
 	}
 	// Set callback function

@@ -237,7 +237,7 @@ void config::commandline_config(const char* conf_path) {
 	config_file_path.push_back(conf_path);
 }
 
-std::string config::getDevice() {
+std::string config::get_device() {
 	return midi_device;
 }
 

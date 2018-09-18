@@ -31,7 +31,7 @@ struct config {
 	void read();
 	void commandline_config(const char*);
 	std::set<Entry> note_list;
-	std::string getDevice();
+	std::string get_device();
 
 private:
 	std::vector<std::string> config_file_path;
