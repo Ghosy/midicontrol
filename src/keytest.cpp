@@ -37,7 +37,7 @@ RtMidiIn *midiin;
 RtMidiOut *midiout;
 bool done;
 
-static void finish(int ignore){ done = true; }
+static void finish(int){ done = true; }
 
 int main(int argc, char* argv[]) {
 	// Cases for all arguments
@@ -167,7 +167,7 @@ cleanup:
 	delete midiout;
 }
 
-void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
+void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 	Entry temp_entry(*note_raw, "");
 
 	if(prog_settings::verbose) {
@@ -376,7 +376,7 @@ cleanup:
 	delete midiin;
 }
 
-void input_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata) {
+void input_read(double, std::vector<unsigned char> *note_raw, void *) {
 	Entry temp_entry(*note_raw, "");
 	// Print note received
 	std::cout << "Note: " << temp_entry.get_note() << std::endl;
