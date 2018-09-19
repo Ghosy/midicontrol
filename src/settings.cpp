@@ -86,7 +86,7 @@ void config::read() {
 
 		// If no valid notes for device
 		if(!device["notes"].IsSequence() && !device["notes"] && !prog_settings::silent) {
-			std::cerr << "No valid notes found for " << device["device"] << "\n";
+			std::cerr << "No valid notes found for " << device["device"] << '\n';
 			exit(EXIT_FAILURE);
 		}
 
@@ -142,14 +142,14 @@ void config::read() {
 					// Print error light_mode not valid
 					if(!prog_settings::silent) {
 						std::cerr << "The light_mode is invalid for " << format_note(lows, highs) << '\n';
-						std::cerr << note["light_mode"] << " is not a valid value for light_mode" << '\n';
+						std::cerr << note["light_mode"] << " is not a valid value for light_mode\n";
 					}
 				}
 				// Warn if light value not in range
 				if(new_light_value > 255) {
 					if(!prog_settings::silent) {
 						std::cerr << "The light_value is invalid for " << format_note(lows, highs) << '\n';
-						std::cerr << new_light_value << " is not a valid light value" << '\n';
+						std::cerr << new_light_value << " is not a valid light value\n";
 					}
 				}
 
@@ -176,6 +176,7 @@ void config::read() {
 			for(unsigned int i = 0; i < off_entries.size(); ++i) {
 				std::set<Entry>::iterator it_find = settings.note_list.find(off_entries[i]);
 
+				// If off note found
 				if(it_find != settings.note_list.end()) {
 					// Modify entry for found
 					if(it_find->light_mode == LightMode::NONE) {
@@ -189,7 +190,7 @@ void config::read() {
 					else {
 						// Print error light_mode used incorrectly
 						if(!prog_settings::silent)
-							std::cerr << it_find->get_note() << " has a light mode with a corresponding note on, which has light_push" << '\n' << it_find->get_note() << " should not have a light_mode, if using light_push on a corresponding note" << '\n';
+							std::cerr << it_find->get_note() << " has a light mode with a corresponding note on, which has light_push\n" << it_find->get_note() << " should not have a light_mode, if using light_push on a corresponding note\n";
 					}
 				}
 				else {
@@ -266,10 +267,10 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 			if(!prog_settings::silent) {
 				// Check for invalid values
 				if(low > 255 || low < 0) {
-					std::cerr << low << " is not a valid value for a note" << '\n';
+					std::cerr << low << " is not a valid value for a note\n";
 				}
 				if( high > 255 || high < 0) {
-					std::cerr << high << " is not a valid value for a note" << '\n';
+					std::cerr << high << " is not a valid value for a note\n";
 				}
 			}
 
@@ -282,7 +283,7 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 			if(!prog_settings::silent) {
 				// Check for invalid value
 				if(val > 255 || val < 0) {
-					std::cerr << val << " is not a valid value for a note" << '\n';
+					std::cerr << val << " is not a valid value for a note\n";
 				}
 			}
 
@@ -298,12 +299,12 @@ unsigned int config::stoi_check(const std::string& s) {
 		return std::stoi(s);
 	}
 	catch(std::invalid_argument& e) {
-		std::cerr << s << " is not a valid value" << '\n';
-		std::cerr << "returning 0 instead" << '\n';
+		std::cerr << s << " is not a valid value\n";
+		std::cerr << "returning 0 instead\n";
 	}
 	catch(std::out_of_range& e) {
-		std::cerr << s << " is not with range" << '\n';
-		std::cerr << "returning 0 instead" << '\n';
+		std::cerr << s << " is not with range\n";
+		std::cerr << "returning 0 instead\n";
 	}
 	return 0;
 }

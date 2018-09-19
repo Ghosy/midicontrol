@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
 				settings.commandline_config(argv[i]);
 			}
 			else {
-				std::cerr << "No Configuration file was specified." << '\n';
+				std::cerr << "No Configuration file was specified.\n";
 			}
 		}
 		else if((arg == "-d") || (arg == "--delay")) {
@@ -61,16 +61,16 @@ int main(int argc, char* argv[]) {
 						prog_settings::delay = delay;
 					}
 					else {
-						std::cerr << "The delay specified must be greater than 0" << '\n';
+						std::cerr << "The delay specified must be greater than 0\n";
 					}
 				}
 				catch(...) {
-					std::cerr << argv[i] << " is not a valid value for delay" << '\n';
+					std::cerr << argv[i] << " is not a valid value for delay\n";
 					exit(EXIT_FAILURE);
 				}
 			}
 			else {
-				std::cerr << "No delay was specified." << '\n';
+				std::cerr << "No delay was specified.\n";
 			}
 		}
 		else if((arg == "-h") || (arg == "--help")) {
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 				exit(EXIT_SUCCESS);
 			}
 			else {
-				std::cerr << "No input device was specified." << '\n';
+				std::cerr << "No input device was specified.\n";
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -142,7 +142,7 @@ void scan_ports() {
 
 	// Check to ensure a port was opened
 	if(!midiin->isPortOpen()) {
-		std::cerr << "Failed to open device \"" << settings.get_device() << "\"" << '\n';
+		std::cerr << "Failed to open device \"" << settings.get_device() << "\"\n";
 		exit(EXIT_FAILURE);
 	}
 	// Set callback function
@@ -355,7 +355,7 @@ void input_scan(std::string device) {
 
 	// Check to ensure a port was opened
 	if(!midiin->isPortOpen()) {
-		std::cerr << "Failed to open device \"" << device << "\"" << '\n';
+		std::cerr << "Failed to open device \"" << device << "\"\n";
 		exit(EXIT_FAILURE);
 	}
 	// Set callback function
