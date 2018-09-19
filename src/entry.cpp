@@ -20,6 +20,7 @@
  */
 #include <iostream>
 #include <sstream>
+#include <tuple>
 #include <vector>
 
 #include "entry.h"
@@ -58,11 +59,7 @@ bool Entry::operator==(const Entry& other) const {
 }
 
 bool Entry::operator<(const Entry& other) const {
-	for(int i = 0; i < 3; ++i) {
-		if(note[i] < other.note[i])
-			return true;
-	}
-	return false;
+	return std::tie(note[0], note[1], note[2]) < std::tie(other.note[0], other.note[1], other.note[2]); 
 }
 
 std::string Entry::get_note() const {
