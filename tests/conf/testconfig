@@ -1,0 +1,10 @@
+---
+devices:
+- device: Test:Test MIDI 1
+  notes:
+  - note: '144,0..2,127'
+    command: test
+    light_mode: LIGHT_PUSH
+    light_value: 60
+  - note: '144,1,0'
+    command: test2
