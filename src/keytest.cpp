@@ -210,15 +210,15 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 			switch(match.light_mode) {
 				case LightMode::LIGHT_ON:
 				case LightMode::LIGHT_PUSH: {
-					note_send((int)note_raw->at(1), match.light_value);
+					note_send({note_raw->at(0), note_raw->at(1), match.light_value});
 					break;
 				}
 				case LightMode::LIGHT_OFF: {
-					note_send((int)note_raw->at(1), 0);
+					note_send({note_raw->at(0), note_raw->at(1), 0});
 					break;
 				}
 				case LightMode::LIGHT_WAIT: {
-					note_send((int)note_raw->at(1), match.light_value);
+					note_send({note_raw->at(0), note_raw->at(1), match.light_value});
 
 					// Fork and wait for child executing command to exit
 					pid_t pid_light = fork();
@@ -231,7 +231,7 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 							usleep(10000);
 						}
 						// Turn off led
-						note_send((int)note_raw->at(1), 0);
+						note_send({note_raw->at(0), note_raw->at(1), 0});
 						_exit(0);
 					}
 					break;
@@ -412,13 +412,12 @@ void light_state_check() {
 				// Positive response(grep found)
 				if(ret == 0) {
 					// Turn on led
-					// TODO: Fix so that this makes more sense, check function for TODO below
-					note_send(e.note[1], e.light_value);
+					note_send({e.note[0], e.note[1], (unsigned char)e.light_value});
 				}
 				// Negative response(grep failed to find)
 				else if(ret == 1) {
 					// Turn off led
-					note_send(e.note[1], 0);
+					note_send({e.note[0], e.note[1], 0});
 				}
 				// Command exited with neither 1 nor 0
 				else {
@@ -441,9 +440,9 @@ void light_state_check() {
 						if(fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
 					pclose(stream);
 				}
-				int new_light_value = std::stoi(data);
+				unsigned char new_light_value = std::stoi(data);
 
-				note_send(e.note[1], new_light_value);
+				note_send({e.note[0], e.note[1], new_light_value});
 			}
 			// wait for delay time
 			usleep(prog_settings::delay * 1000);
@@ -463,13 +462,7 @@ std::string note_replace(std::string s, unsigned int note) {
 			return s;
 }
 
-// TODO: Add support for more channel support than channel 1
-// TODO: Should this use entry?
-void note_send(unsigned char data_1, unsigned char data_2) {
-	std::vector<unsigned char> message;
-	message.push_back(144);
-	message.push_back(data_1);
-	message.push_back(data_2);
-	midiout->sendMessage(&message);
+void note_send(const std::vector<unsigned char> note) {
+	midiout->sendMessage(&note);
 }
 /* vim: set ts=8 sw=8 tw=0 noet :*/

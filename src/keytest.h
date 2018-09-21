@@ -67,9 +67,9 @@ void light_state_check();
 std::string note_replace(std::string s, unsigned int note);
 
 /**
- * @brief Send midi note back to the device in the format of 144, data_1, data_2
+ * @brief Send midi note back to the device
  */
-void note_send(unsigned char data_1, unsigned char data_2);
+void note_send(const std::vector<unsigned char> note);
 
 #endif
 /* vim: set ts=8 sw=8 tw=0 noet :*/
