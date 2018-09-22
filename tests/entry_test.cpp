@@ -1,7 +1,7 @@
 #include<catch2/catch.hpp>
 #include "../src/entry.h"
 
-TEST_CASE("Test") {
+TEST_CASE("Entry") {
 	Entry test_entry({144,1,127}, "echo \"test\"", LightMode::LIGHT_WAIT, 60, "sleep 5");
 	std::vector<unsigned char> test = {144,1,127};
 
