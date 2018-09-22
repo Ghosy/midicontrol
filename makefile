@@ -26,6 +26,11 @@ SRCS := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 # Object files
 OBJS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRCS:.$(SRCEXT)=.o))
 
+# Set PREFIX if not set
+ifeq ($(strip $(PREFIX)),)
+	PREFIX := /usr/local
+endif
+
 $(TARGET): $(OBJS)
 	@echo "Linking...";
 	@mkdir -p $(BINDIR)
@@ -64,7 +69,6 @@ $(TARGET_TEST): $(OBJS_TEST)
 $(BUILDDIR)/%.o: $(TESTDIR)/%.$(SRCEXT)
 	@echo " $(CC) $(CFLAGS) -c -o $@ $<"; $(CC) $(CFLAGS) -c -o $@ $<
 
-PREFIX := /usr/local
 
 BIN_INSTALL := $(DESTDIR)$(PREFIX)/bin/midicontrol
 MAN_INSTALL := $(DESTDIR)$(PREFIX)/share/man/man1/midicontrol.1.gz
