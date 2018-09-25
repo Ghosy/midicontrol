@@ -1,7 +1,7 @@
 # Compiler
-CC := g++
+CXX := g++
 # Compile-time flags
-CFLAGS := -std=c++11 -pedantic -Wall -Wextra -g3
+CXXFLAGS := -std=c++11 -pedantic -Wall -Wextra -g3
 
 # Source directory
 SRCDIR := src
@@ -34,17 +34,17 @@ endif
 $(TARGET): $(OBJS)
 	@echo "Linking...";
 	@mkdir -p $(BINDIR)
-	@echo " $(CC) $^ -o $(TARGET) $(LIBS)"; $(CC) $^ -o $(TARGET) $(LIBS)
+	@echo " $(CXX) $^ -o $(TARGET) $(LIBS)"; $(CXX) $^ -o $(TARGET) $(LIBS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
-	@echo " $(CC) $(CFLAGS) -c -o $@ $<"; $(CC) $(CFLAGS) -c -o $@ $<
+	@echo " CXX    $@"; $(CXX) $(CXXFLAGS) -c -o $@ $<
 
 clean:
-	@echo " Cleaning..."
-	@echo " $(RM) -r $(BUILDDIR)"; $(RM) -r $(BUILDDIR)
-	@echo " $(RM) -r $(BINDIR)"; $(RM) -r $(BINDIR)
-	@echo " $(RM) -r $(DOCSDIR)/html"; $(RM) -r $(DOCSDIR)/html
+	@echo "Cleaning..."
+	@echo " RM    $(BUILDDIR)"; $(RM) -r $(BUILDDIR)
+	@echo " RM    $(BINDIR)"; $(RM) -r $(BINDIR)
+	@echo " RM    $(DOCSDIR)/html"; $(RM) -r $(DOCSDIR)/html
 
 docs:
 	@doxygen $(DOCSDIR)/Doxyfile
@@ -64,10 +64,10 @@ test: $(TARGET_TEST)
 $(TARGET_TEST): $(OBJS_TEST)
 	@echo "Linking Test...";
 	@mkdir -p $(BINDIR)
-	@echo " $(CC) $(CFLAGS) $^ -o $@ $(LIBS)"; $(CC) $(CFLAGS) $^ -o $@ $(LIBS)
+	@echo " $(CXX) $(CXXFLAGS) $^ -o $@ $(LIBS)"; $(CXX) $(CXXFLAGS) $^ -o $@ $(LIBS)
 
 $(BUILDDIR)/%.o: $(TESTDIR)/%.$(SRCEXT)
-	@echo " $(CC) $(CFLAGS) -c -o $@ $<"; $(CC) $(CFLAGS) -c -o $@ $<
+	@echo " CXX    $@"; $(CXX) $(CXXFLAGS) -c -o $@ $<
 
 
 BIN_INSTALL := $(DESTDIR)$(PREFIX)/bin/midicontrol
