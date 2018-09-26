@@ -1,8 +1,6 @@
 bin
 build
-doc/*
-!doc/Doxyfile
-!doc/midicontrol.1
+doc/html
 test/*
 TODO
 !.gitignore

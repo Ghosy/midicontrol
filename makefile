@@ -72,8 +72,9 @@ $(BUILDDIR)/%.o: $(TESTDIR)/%.$(SRCEXT)
 
 BIN_INSTALL := $(DESTDIR)$(PREFIX)/bin/midicontrol
 MAN_INSTALL := $(DESTDIR)$(PREFIX)/share/man/man1/midicontrol.1.gz
+BSH_COMP_INSTALL := /usr/share/bash-completion/completions/midicontrol
 
-install: $(BIN_INSTALL) $(MAN_INSTALL)
+install: $(BIN_INSTALL) $(MAN_INSTALL) $(BSH_COMP_INSTALL)
 
 $(BIN_INSTALL):
 	install -Dm 755 $(TARGET) $(DESTDIR)$(PREFIX)/bin/
@@ -82,9 +83,13 @@ $(MAN_INSTALL):
 	install -Dm 644 doc/midicontrol.1 $(DESTDIR)$(PREFIX)/share/man/man1/
 	gzip $(DESTDIR)$(PREFIX)/share/man/man1/midicontrol.1
 
+$(BSH_COMP_INSTALL):
+	install -Dm 644 doc/midicontrol.bashcomp $@
+
 uninstall:
 	rm $(DESTDIR)$(PREFIX)/bin/midicontrol
 	rm $(DESTDIR)$(PREFIX)/share/man/man1/midicontrol.1.gz
+	rm $(BSH_COMP_INSTALL)
 
 .PHONY: clean docs test install uninstall
 
