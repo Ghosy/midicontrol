@@ -28,13 +28,13 @@
 Entry::Entry() {
 }
 
-Entry::Entry(std::vector<unsigned char> new_note, std::string new_action)
+Entry::Entry(const std::vector<unsigned char> new_note, const std::string new_action)
 	: Entry::Entry(new_note, new_action, LightMode::NONE, 0, "") {}
 
-Entry::Entry(std::vector<unsigned char> new_note, std::string new_action, LightMode new_mode, unsigned char new_light_value)
+Entry::Entry(const std::vector<unsigned char> new_note, const std::string new_action, LightMode new_mode, unsigned char new_light_value)
 	: Entry::Entry(new_note, new_action, new_mode, new_light_value, "") {}
 
-Entry::Entry(std::vector<unsigned char> new_note, std::string new_action, LightMode new_mode, unsigned char new_light_value, std::string new_light_command)
+Entry::Entry(const std::vector<unsigned char> new_note, const std::string new_action, LightMode new_mode, unsigned char new_light_value, const std::string new_light_command)
 	: note(new_note),
 	action(new_action),
 	light_mode(new_mode),

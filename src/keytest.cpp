@@ -325,7 +325,7 @@ cleanup:
 	delete midiout;
 }
 
-void input_scan(std::string device) {
+void input_scan(const std::string device) {
 	RtMidiIn  *midiin = 0;
 
 	try {
@@ -429,13 +429,14 @@ void light_state_check() {
 			for(auto e: var_list) {
 				std::string data;
 				FILE * stream;
-				const int max_buffer = 256;
-				char buffer[max_buffer];
 				// Only get stdout
 				std::string command = e.light_command.append(" 2>&1");
 
 				stream = popen(command.c_str(), "r");
 				if(stream) {
+					const int max_buffer = 256;
+					char buffer[max_buffer] = "";
+
 					while(!feof(stream))
 						if(fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
 					pclose(stream);
@@ -462,7 +463,7 @@ std::string note_replace(std::string s, unsigned int note) {
 			return s;
 }
 
-void note_send(const std::vector<unsigned char> note) {
+void note_send(const std::vector<unsigned char> &note) {
 	midiout->sendMessage(&note);
 }
 /* vim: set ts=8 sw=8 tw=0 noet :*/

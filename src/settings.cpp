@@ -103,8 +103,8 @@ void config::read() {
 
 			// If there are light settings
 			if(note["light_mode"]) {
-				LightMode new_mode;
-				unsigned int new_light_value;
+				LightMode new_mode = LightMode::LIGHT_OFF;
+				unsigned int new_light_value = 0;
 				std::string new_light_command = "";
 
 				std::string temp_mode = note["light_mode"].as<std::string>();
@@ -250,7 +250,7 @@ std::string config::trim(std::string s) {
 	return s;
 }
 
-std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_note(const std::string note) {
+std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_note(const std::string &note) {
 	std::vector<unsigned char> lows;
 	std::vector<unsigned char> highs;
 	std::string temp;

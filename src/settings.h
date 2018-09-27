@@ -39,7 +39,7 @@ private:
 	std::string trim(std::string);
 	void insert_note(std::vector<unsigned char>, std::vector<unsigned char>, std::string, LightMode, unsigned int, std::string);
 	std::string format_note(std::vector<unsigned char>, std::vector<unsigned char>);
-	std::pair<std::vector<unsigned char>, std::vector<unsigned char>> read_note(const std::string);
+	std::pair<std::vector<unsigned char>, std::vector<unsigned char>> read_note(const std::string &);
 	unsigned int stoi_check(const std::string&);
 };
 

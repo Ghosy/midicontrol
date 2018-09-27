@@ -49,7 +49,7 @@ void list_ports();
  * @brief Open midi device to read incoming signals and display those signals
  * @param device The name of the device input is being scanned from
  */
-void input_scan(std::string device);
+void input_scan(const std::string device);
 
 /**
  * @brief The callback function for handling incoming notes called from input_scan
@@ -69,7 +69,7 @@ std::string note_replace(std::string s, unsigned int note);
 /**
  * @brief Send midi note back to the device
  */
-void note_send(const std::vector<unsigned char> note);
+void note_send(const std::vector<unsigned char> &note);
 
 #endif
 /* vim: set ts=8 sw=8 tw=0 noet :*/
