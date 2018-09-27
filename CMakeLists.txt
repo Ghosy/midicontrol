@@ -16,4 +16,4 @@ else()
 endif()
 
 add_executable(midicontrol ${MIDICONTROL_SOURCES})
-target_link_libraries(midicontrol rtmidi boost_regex)
+target_link_libraries(midicontrol rtmidi boost_regex yaml-cpp)
