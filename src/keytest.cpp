@@ -100,6 +100,10 @@ int main(int argc, char* argv[]) {
 		else if((arg == "-v") || (arg == "--verbose")) {
 			prog_settings::verbose = true;
 		}
+		else if(arg == "--version") {
+			show_version();
+			exit(EXIT_SUCCESS);
+		}
 		// If the argument is not supported show_usage
 		else {
 			show_usage();
@@ -267,8 +271,20 @@ void show_usage() {
 		<< "  -l, --list            List midi input/output ports\n"
 		<< "  -q, --quiet           Suppress normal output when reading midi input\n"
 		<< "  -s, --silent          Suppress normal output and suppress errors\n"
+		<< "      --version         Show version information\n"
 		<< "  -v, --verbose         Print extra information during reading input\n"
 		<< "                          --quiet and --silent override --verbose\n"
+		;
+}
+
+void show_version() {
+	std::cout
+		<< "midicontrol, version 0.1\n"
+		<< "Copyright (C) 2014-2018 Zachary Matthews\n"
+		<< "License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n"
+		<< "\n"
+		<< "This is free software; you are free to change and redistribute it.\n"
+		<< "There is NO WARRANTY, to the extent permitted by law.\n"
 		;
 }
 

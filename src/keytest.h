@@ -41,6 +41,11 @@ void scan_ports();
 void show_usage();
 
 /**
+ * @brief Display version message to stdout
+ */
+void show_version();
+
+/**
  * @brief Display incoming and outgoing midi devices to stdout
  */
 void list_ports();

@@ -28,6 +28,7 @@ _midicontrol() {
 			--input
 			--list
 			--quiet
+			--version
 			--verbose"
 
 
