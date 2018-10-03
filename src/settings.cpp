@@ -42,10 +42,6 @@ config::config() {
 }
 
 void config::read() {
-	if(prog_settings::verbose) {
-		std::cout << "Reading Config File:\n";
-	}
-
 	std::string config_file = "";
 	// Check all possible config paths
 	for(unsigned int i = 0; i < config_file_path.size(); ++i) {
@@ -62,6 +58,10 @@ void config::read() {
 		}
 	}
 	YAML::Node config;
+
+	if(prog_settings::verbose) {
+		std::cout << "Reading Config File: " << config_file << "\n";
+	}
 	
 	// Ensure the file trying to be loaded exists before trying
 	if(!config_file.empty()) {

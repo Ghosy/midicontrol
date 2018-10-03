@@ -197,7 +197,7 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 				dup2(fd, 1);
 			}
 			if(prog_settings::verbose) {
-				std::cout << "Note: " << temp_entry.get_note() << "\nExecuting: " << match.action << std::endl;
+				std::cout << "Entry Note: " << temp_entry.get_note() << "\nExecuting: " << match.action << std::endl;
 			}
 			// TODO: Should this be hardcoded with note[2]?
 			std::string command = note_replace(match.action, (int)temp_entry.note[2]);
@@ -481,5 +481,9 @@ std::string note_replace(std::string s, unsigned int note) {
 
 void note_send(const std::vector<unsigned char> &note) {
 	midiout->sendMessage(&note);
+	if(prog_settings::verbose) {
+		Entry temp_entry(note, "");
+		std::cout << "Note sent: " << temp_entry.get_note() << std::endl;
+	}
 }
 /* vim: set ts=8 sw=8 tw=0 noet :*/
