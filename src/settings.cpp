@@ -180,9 +180,9 @@ void config::read() {
 				if(it_find != settings.note_list.end()) {
 					// Modify entry for found
 					if(it_find->light_mode == LightMode::NONE) {
-						std::vector<unsigned char> temp_note = it_find->note;
+						// std::vector<unsigned char> temp_note = it_find->note;
 						// Create modified version of found
-						Entry new_entry(temp_note, it_find->action, LightMode::LIGHT_OFF, (unsigned char)0);
+						Entry new_entry(it_find->note, it_find->action, LightMode::LIGHT_OFF, (unsigned char)0);
 						// Remove found and insert modified
 						note_list.erase(it_find);
 						note_list.insert(new_entry);
