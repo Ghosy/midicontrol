@@ -81,13 +81,6 @@ class Entry
 		Entry(std::vector<unsigned char> new_note, std::string new_action, LightMode new_mode, unsigned char new_light_value, std::string new_light_command);
 
 		/**
-		 * @brief Returns true if and only if the Entry contains the specified midi note
-		 * @param other_note A vector containing the three segments of a midi note
-		 * @return True, if the Entry contains note, false otherwise
-		 */
-		bool contains(const std::vector<unsigned char>& other_note) const;
-
-		/**
 		 * @brief Returns true if midi notes are equal
 		 * @param other An Entry being compared to the current Entry
 		 * @return True, if current Entry is equal to other Entry

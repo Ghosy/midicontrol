@@ -41,15 +41,6 @@ Entry::Entry(const std::vector<unsigned char> new_note, const std::string new_ac
 	light_command(new_light_command),
 	light_value(new_light_value) {}
 
-// TODO: Replace with equality check?
-bool Entry::contains(const std::vector<unsigned char>& other_note) const {
-	for(int i = 0; i < 3; ++i) {
-		if(other_note[i] < note[i] || other_note[i] > note[i])
-			return false;
-	}
-	return true;
-}
-
 bool Entry::operator==(const Entry& other) const {
 	for(int i = 0; i < 3; ++i) {
 		if(other.note[i] != note[i])

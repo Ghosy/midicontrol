@@ -180,7 +180,7 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 
 	// Find matches to incoming note
 	std::vector<Entry> matches;
-	std::copy_if(settings.note_list.begin(), settings.note_list.end(), std::back_inserter(matches), [note_raw](Entry e){return e.contains(*note_raw);});
+	std::copy_if(settings.note_list.begin(), settings.note_list.end(), std::back_inserter(matches), [temp_entry](Entry e){return e == temp_entry;});
 
 	// For each matching note in conf
 	for(auto match: matches) {
