@@ -36,7 +36,7 @@ config::config() {
 		config_file_path.push_back(std::string(getenv("HOME")) + "/.config/midicontrol/midicontrolrc");
 	}
 	else {
-		config_file_path.push_back(std::string(getenv("XDG_CONFIG_HOME")) + "/midicontrol/midicontrolrc");
+		config_file_path.push_back(std::string(getenv("XDG_CONFIG_HOME")) + "/midicontrol/config");
 	}
 	midi_device = "";
 }
@@ -180,7 +180,6 @@ void config::read() {
 				if(it_find != settings.note_list.end()) {
 					// Modify entry for found
 					if(it_find->light_mode == LightMode::NONE) {
-						// std::vector<unsigned char> temp_note = it_find->note;
 						// Create modified version of found
 						Entry new_entry(it_find->note, it_find->action, LightMode::LIGHT_OFF, (unsigned char)0);
 						// Remove found and insert modified
