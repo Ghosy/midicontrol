@@ -32,7 +32,7 @@ config settings;
 
 config::config() {
 	config_file_path.push_back(std::string(getenv("HOME")) + "/.midicontrolrc");
-	if(getenv("XDG_CONFIG_HOME") == NULL) {
+	if(getenv("XDG_CONFIG_HOME") == nullptr) {
 		config_file_path.push_back(std::string(getenv("HOME")) + "/.config/midicontrol/midicontrolrc");
 	}
 	else {
@@ -42,7 +42,7 @@ config::config() {
 }
 
 void config::read() {
-	std::string config_file = "";
+	std::string config_file;
 	// Check all possible config paths
 	for(unsigned int i = 0; i < config_file_path.size(); ++i) {
 		std::ifstream f(config_file_path[i].c_str());
@@ -51,10 +51,8 @@ void config::read() {
 			config_file = config_file_path[i];
 			break;
 		}
-		else {
-			if(prog_settings::verbose) {
-				std::cout << config_file_path[i] << " cannot be read\n";
-			}
+		if(prog_settings::verbose) {
+			std::cout << config_file_path[i] << " cannot be read\n";
 		}
 	}
 	YAML::Node config;
@@ -105,7 +103,7 @@ void config::read() {
 			if(note["light_mode"]) {
 				LightMode new_mode = LightMode::LIGHT_OFF;
 				unsigned int new_light_value = 0;
-				std::string new_light_command = "";
+				std::string new_light_command;
 
 				std::string temp_mode = note["light_mode"].as<std::string>();
 				// To lower temp_mode
@@ -174,7 +172,7 @@ void config::read() {
 			std::vector<Entry> off_entries = {off_entry1, off_entry2};
 
 			for(unsigned int i = 0; i < off_entries.size(); ++i) {
-				std::set<Entry>::iterator it_find = settings.note_list.find(off_entries[i]);
+				auto it_find = settings.note_list.find(off_entries[i]);
 
 				// If off note found
 				if(it_find != settings.note_list.end()) {
@@ -188,8 +186,9 @@ void config::read() {
 					}
 					else {
 						// Print error light_mode used incorrectly
-						if(!prog_settings::silent)
+						if(!prog_settings::silent) {
 							std::cerr << it_find->get_note() << " has a light mode with a corresponding note on, which has light_push\n" << it_find->get_note() << " should not have a light_mode, if using light_push on a corresponding note\n";
+						}
 					}
 				}
 				else {

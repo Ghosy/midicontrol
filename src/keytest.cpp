@@ -160,8 +160,9 @@ void scan_ports() {
 	(void) signal(SIGINT, finish);
 	// Start light_mode checker
 	light_state_check();
-	if(!prog_settings::quiet && !prog_settings::silent)
+	if(!prog_settings::quiet && !prog_settings::silent) {
 		std::cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
+	}
 	while(!done) {
 		usleep(10000);
 	}
@@ -183,7 +184,7 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 	std::copy_if(settings.note_list.begin(), settings.note_list.end(), std::back_inserter(matches), [temp_entry](Entry e){return e == temp_entry;});
 
 	// For each matching note in conf
-	for(auto match: matches) {
+	for(const auto &match: matches) {
 		// Ensure all children are reaped
 		signal(SIGCHLD, SIG_IGN);
 		// Fork for command to be run
@@ -250,8 +251,9 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 				}
 				default: {
 					// Print error non conforming light_mode
-					if(!prog_settings::silent)
+					if(!prog_settings::silent) {
 						std::cerr << "Non-conforming light_mode found for note, " << match.get_note() << '\n';
+					}
 					break;
 				}
 			}
@@ -289,8 +291,8 @@ void show_version() {
 }
 
 void list_ports() {
-	RtMidiIn  *midiin = 0;
-	RtMidiOut *midiout = 0;
+	RtMidiIn  *midiin = nullptr;
+	RtMidiOut *midiout = nullptr;
 	// RtMidiIn initialization
 	try {
 		midiin = new RtMidiIn();
@@ -342,7 +344,7 @@ cleanup:
 }
 
 void input_scan(const std::string device) {
-	RtMidiIn  *midiin = 0;
+	RtMidiIn  *midiin = nullptr;
 
 	try {
 		midiin = new RtMidiIn();
