@@ -33,7 +33,7 @@ config settings;
 config::config() {
 	config_file_path.push_back(std::string(getenv("HOME")) + "/.midicontrolrc");
 	if(getenv("XDG_CONFIG_HOME") == nullptr) {
-		config_file_path.push_back(std::string(getenv("HOME")) + "/.config/midicontrol/midicontrolrc");
+		config_file_path.push_back(std::string(getenv("HOME")) + "/.config/midicontrol/config");
 	}
 	else {
 		config_file_path.push_back(std::string(getenv("XDG_CONFIG_HOME")) + "/midicontrol/config");
