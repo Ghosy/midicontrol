@@ -44,15 +44,15 @@ config::config() {
 void config::read() {
 	std::string config_file;
 	// Check all possible config paths
-	for(unsigned int i = 0; i < config_file_path.size(); ++i) {
-		std::ifstream f(config_file_path[i].c_str());
+	for(const auto &path: config_file_path) {
+		std::ifstream f(path.c_str());
 		// Check current file
 		if(f.good()) {
-			config_file = config_file_path[i];
+			config_file = path;
 			break;
 		}
 		if(prog_settings::verbose) {
-			std::cout << config_file_path[i] << " cannot be read\n";
+			std::cout << path << " cannot be read\n";
 		}
 	}
 	YAML::Node config;
