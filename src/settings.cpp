@@ -171,8 +171,8 @@ void config::read() {
 
 			std::vector<Entry> off_entries = {off_entry1, off_entry2};
 
-			for(unsigned int i = 0; i < off_entries.size(); ++i) {
-				auto it_find = settings.note_list.find(off_entries[i]);
+			for(const auto &off_entry: off_entries) {
+				auto it_find = settings.note_list.find(off_entry);
 
 				// If off note found
 				if(it_find != settings.note_list.end()) {
@@ -192,7 +192,7 @@ void config::read() {
 					}
 				}
 				else {
-					Entry new_entry(off_entries[i].note, "", LightMode::LIGHT_OFF, (unsigned char)0);
+					Entry new_entry(off_entry.note, "", LightMode::LIGHT_OFF, (unsigned char)0);
 					note_list.insert(new_entry);
 				}
 			}
