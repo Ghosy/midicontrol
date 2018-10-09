@@ -343,7 +343,7 @@ cleanup:
 	delete midiout;
 }
 
-void input_scan(const std::string device) {
+void input_scan(const std::string &device) {
 	RtMidiIn  *midiin = nullptr;
 
 	try {
