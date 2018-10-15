@@ -22,6 +22,9 @@
 #include <fcntl.h>
 #include <iostream>
 #include <signal.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 #include <sstream>
 #include <string>
 #include <sys/prctl.h>
@@ -35,11 +38,35 @@
 
 RtMidiIn *midiin;
 RtMidiOut *midiout;
+std::shared_ptr<spdlog::logger> logger;
 bool done;
 
 static void finish(int){ done = true; }
 
 int main(int argc, char* argv[]) {
+	// Setup logger
+	try {
+		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+		// Set level and pattern
+		console_sink->set_level(spdlog::level::info);
+		console_sink->set_pattern("[%^%l%$] %v");
+
+		auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(settings.log_path, true);
+		file_sink->set_level(spdlog::level::trace);
+		file_sink->set_pattern("[%Y-%m-%d %T.%e] [%l] %v");
+
+		auto new_logger = std::make_shared<spdlog::logger>("multi_sink", spdlog::sinks_init_list{console_sink, file_sink});
+
+		// Don't forget to let all info through logger to sinks
+		new_logger->set_level(spdlog::level::trace);
+		spdlog::register_logger(new_logger);
+
+		// Set global var
+		logger = spdlog::get("multi_sink");
+	}
+	catch(const spdlog::spdlog_ex &ex) {
+		std::cerr << "Log initialization failed: " << ex.what() << std::endl;
+	}
 	// Cases for all arguments
 	for(int i = 1; i < argc; ++i) {
 		std::string arg = argv[i];
@@ -49,7 +76,8 @@ int main(int argc, char* argv[]) {
 				settings.commandline_config(argv[i]);
 			}
 			else {
-				std::cerr << "No Configuration file was specified.\n";
+				logger->error("No Configuration file was specified.");
+				exit(EXIT_FAILURE);
 			}
 		}
 		else if((arg == "-d") || (arg == "--delay")) {
@@ -61,16 +89,17 @@ int main(int argc, char* argv[]) {
 						prog_settings::delay = delay;
 					}
 					else {
-						std::cerr << "The delay specified must be greater than 0\n";
+						logger->error("The delay specified must be greater than 0");
 					}
 				}
 				catch(...) {
-					std::cerr << argv[i] << " is not a valid value for delay\n";
+					logger->error("\"{}\" is not a valid value for delay", argv[i]);
+
 					exit(EXIT_FAILURE);
 				}
 			}
 			else {
-				std::cerr << "No delay was specified.\n";
+				logger->error("No delay was specified.");
 			}
 		}
 		else if((arg == "-h") || (arg == "--help")) {
@@ -83,7 +112,7 @@ int main(int argc, char* argv[]) {
 				exit(EXIT_SUCCESS);
 			}
 			else {
-				std::cerr << "No input device was specified.\n";
+				logger->error("No input device was specified.");
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -92,13 +121,13 @@ int main(int argc, char* argv[]) {
 			exit(EXIT_SUCCESS);
 		}
 		else if((arg == "-q") || (arg == "--quiet")) {
-			prog_settings::quiet = true;
+			logger->sinks()[0]->set_level(spdlog::level::err);
 		}
 		else if((arg == "-s") || (arg == "--silent")) {
-			prog_settings::silent = true;
+			logger->sinks()[0]->set_level(spdlog::level::off);
 		}
 		else if((arg == "-v") || (arg == "--verbose")) {
-			prog_settings::verbose = true;
+			logger->sinks()[0]->set_level(spdlog::level::debug);
 		}
 		else if(arg == "--version") {
 			show_version();
@@ -130,7 +159,7 @@ void scan_ports() {
 	// Check available ports.
 	unsigned int nPorts = midiin->getPortCount();
 	if(nPorts == 0) {
-		std::cout << "No ports available!\n";
+		logger->error("No ports available!\n");
 		goto cleanup;
 	}
 	// Go threw ports and open the configured device
@@ -146,7 +175,7 @@ void scan_ports() {
 
 	// Check to ensure a port was opened
 	if(!midiin->isPortOpen()) {
-		std::cerr << "Failed to open device \"" << settings.get_device() << "\"\n";
+		logger->error("Failed to open device \"{}\"", settings.get_device());
 		exit(EXIT_FAILURE);
 	}
 	// Set callback function
@@ -160,9 +189,7 @@ void scan_ports() {
 	(void) signal(SIGINT, finish);
 	// Start light_mode checker
 	light_state_check();
-	if(!prog_settings::quiet && !prog_settings::silent) {
-		std::cout << "Reading MIDI from port ... quit with Ctrl-C.\n";
-	}
+	logger->info("Reading MIDI from port ... quit with Ctrl-C.");
 	while(!done) {
 		usleep(10000);
 	}
@@ -175,9 +202,7 @@ cleanup:
 void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 	Entry temp_entry(*note_raw, "");
 
-	if(prog_settings::verbose) {
-		std::cout << "Incoming note: " << temp_entry.get_note() << std::endl;
-	}
+	logger->debug("Incoming note: {}", temp_entry.get_note());
 
 	// Find matches to incoming note
 	std::vector<Entry> matches;
@@ -197,9 +222,7 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 				int fd = open("/dev/null", O_WRONLY);
 				dup2(fd, 1);
 			}
-			if(prog_settings::verbose) {
-				std::cout << "Entry Note: " << temp_entry.get_note() << "\nExecuting: " << match.action << std::endl;
-			}
+			logger->debug("Entry Note: {}  Executing: {}", temp_entry.get_note(), match.action);
 			// TODO: Should this be hardcoded with note[2]?
 			std::string command = note_replace(match.action, (int)temp_entry.note[2]);
 
@@ -215,47 +238,44 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 			switch(match.light_mode) {
 				case LightMode::LIGHT_ON:
 				case LightMode::LIGHT_PUSH: {
-					note_send({note_raw->at(0), note_raw->at(1), match.light_value});
-					break;
-				}
+								    note_send({note_raw->at(0), note_raw->at(1), match.light_value});
+								    break;
+							    }
 				case LightMode::LIGHT_OFF: {
-					note_send({note_raw->at(0), note_raw->at(1), 0});
-					break;
-				}
+								   note_send({note_raw->at(0), note_raw->at(1), 0});
+								   break;
+							   }
 				case LightMode::LIGHT_WAIT: {
-					note_send({note_raw->at(0), note_raw->at(1), match.light_value});
+								    note_send({note_raw->at(0), note_raw->at(1), match.light_value});
 
-					// Fork and wait for child executing command to exit
-					pid_t pid_light = fork();
-					if(pid_light < 0) {
-						perror("Fork failed");
-					}
-					if(pid_light == 0) {
-						// Wait for action to finish
-						while(kill(pid, 0) == 0) {
-							usleep(10000);
-						}
-						// Turn off led
-						note_send({note_raw->at(0), note_raw->at(1), 0});
-						_exit(0);
-					}
-					break;
-				}
+								    // Fork and wait for child executing command to exit
+								    pid_t pid_light = fork();
+								    if(pid_light < 0) {
+									    perror("Fork failed");
+								    }
+								    if(pid_light == 0) {
+									    // Wait for action to finish
+									    while(kill(pid, 0) == 0) {
+										    usleep(10000);
+									    }
+									    // Turn off led
+									    note_send({note_raw->at(0), note_raw->at(1), 0});
+									    _exit(0);
+								    }
+								    break;
+							    }
 				case LightMode::LIGHT_CHECK: {
-					// Do nothing this mode is not checked on note received
-					break;
-				}
+								     // Do nothing this mode is not checked on note received
+								     break;
+							     }
 				case LightMode::LIGHT_VAR: {
-					// Do nothing this mode is not checked on note received
-					break;
-				}
+								   // Do nothing this mode is not checked on note received
+								   break;
+							   }
 				default: {
-					// Print error non conforming light_mode
-					if(!prog_settings::silent) {
-						std::cerr << "Non-conforming light_mode found for note, " << match.get_note() << '\n';
-					}
-					break;
-				}
+						 logger->error("Non-conforming light_mode found for note, {}", match.get_note());
+						 break;
+					 }
 			}
 		}
 	}
@@ -373,7 +393,7 @@ void input_scan(const std::string &device) {
 
 	// Check to ensure a port was opened
 	if(!midiin->isPortOpen()) {
-		std::cerr << "Failed to open device \"" << device << "\"\n";
+		std::cerr << "Failed to open device \"" << settings.get_device() << "\"\n";
 		exit(EXIT_FAILURE);
 	}
 	// Set callback function
@@ -439,7 +459,7 @@ void light_state_check() {
 				}
 				// Command exited with neither 1 nor 0
 				else {
-					std::cerr << "Unexpected return for light check on " << e.get_note() << '\n';
+					logger->error("Unexpected return for light check on ", e.get_note());
 				}
 
 			}
@@ -473,19 +493,18 @@ void light_state_check() {
 }
 
 std::string note_replace(std::string s, unsigned int note) {
-			// TODO: Break up regex_replace arguments for readability
-			// Replace instances of note value label with current note value
-			s = boost::regex_replace(s, boost::regex("(?<!\\\\)NOTE(?!%)", boost::regex::perl), std::to_string(note));
-			s = boost::regex_replace(s, boost::regex("(?<!\\\\)NOTE%", boost::regex::perl), std::to_string(note * 100 / 127));
-			s = boost::regex_replace(s, boost::regex("\\\\NOTE", boost::regex::perl), "NOTE");
-			return s;
+	// TODO: Break up regex_replace arguments for readability
+	// Replace instances of note value label with current note value
+	s = boost::regex_replace(s, boost::regex("(?<!\\\\)NOTE(?!%)", boost::regex::perl), std::to_string(note));
+	s = boost::regex_replace(s, boost::regex("(?<!\\\\)NOTE%", boost::regex::perl), std::to_string(note * 100 / 127));
+	s = boost::regex_replace(s, boost::regex("\\\\NOTE", boost::regex::perl), "NOTE");
+	return s;
 }
 
 void note_send(const std::vector<unsigned char> &note) {
 	midiout->sendMessage(&note);
-	if(prog_settings::verbose) {
-		Entry temp_entry(note, "");
-		std::cout << "Note sent: " << temp_entry.get_note() << std::endl;
-	}
+
+	Entry temp_entry(note, "");
+	logger->debug("Note sent: {}", temp_entry.get_note());
 }
 /* vim: set ts=8 sw=8 tw=0 noet :*/

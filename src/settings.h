@@ -28,6 +28,8 @@
 struct config {
 	config();
 
+	std::string log_path;
+
 	void read();
 	void commandline_config(const char*);
 	std::set<Entry> note_list;
@@ -41,6 +43,7 @@ private:
 	std::string format_note(std::vector<unsigned char>, std::vector<unsigned char>);
 	std::pair<std::vector<unsigned char>, std::vector<unsigned char>> read_note(const std::string &);
 	unsigned int stoi_check(const std::string&);
+	std::shared_ptr<spdlog::logger> logger;
 };
 
 extern config settings;

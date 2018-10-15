@@ -21,6 +21,7 @@
 #include <algorithm>
 #include <fstream>
 #include <iostream>
+#include <spdlog/spdlog.h>
 #include <string>
 #include <vector>
 #include <yaml-cpp/yaml.h>
@@ -31,6 +32,13 @@
 config settings;
 
 config::config() {
+	if(getenv("XDG_CACHE_HOME") == nullptr) {
+		log_path = std::string(getenv("HOME")) + "/.cache/midicontrol.log";
+	}
+	else {
+		log_path = std::string(getenv("XDG_CACHE_HOME")) + "/midicontrol.log";
+	}
+
 	config_file_path.push_back(std::string(getenv("HOME")) + "/.midicontrolrc");
 	if(getenv("XDG_CONFIG_HOME") == nullptr) {
 		config_file_path.push_back(std::string(getenv("HOME")) + "/.config/midicontrol/config");
@@ -42,6 +50,9 @@ config::config() {
 }
 
 void config::read() {
+	// Get logger
+	logger = spdlog::get("multi_sink");
+
 	std::string config_file;
 	// Check all possible config paths
 	for(const auto &path: config_file_path) {
@@ -51,30 +62,24 @@ void config::read() {
 			config_file = path;
 			break;
 		}
-		if(prog_settings::verbose) {
-			std::cout << path << " cannot be read\n";
-		}
+		logger->debug("{} cannot be read", path);
 	}
 	YAML::Node config;
 
-	if(prog_settings::verbose) {
-		std::cout << "Reading Config File: " << config_file << "\n";
-	}
+	logger->debug("Reading Config File: {}", config_file);
 	
 	// Ensure the file trying to be loaded exists before trying
 	if(!config_file.empty()) {
 		config = YAML::LoadFile(config_file);
 	}
 	else {
-		if(!prog_settings::silent) {
-			std::cerr << "No valid configuration file found\n";
-		}
+		logger->error("No valid configuration file found");
 		exit(EXIT_FAILURE);
 	}
 
 	// If no valid devices in config
-	if(!config["devices"].IsSequence() && !config["devices"] && !prog_settings::silent) {
-		std::cerr << "No valid devices found in configuration file\n";
+	if(!config["devices"].IsSequence() && !config["devices"]) {
+		logger->error("No valid devices found in configuration file");
 		exit(EXIT_FAILURE);
 	}
 
@@ -83,8 +88,8 @@ void config::read() {
 		midi_device = device["device"].as<std::string>();
 
 		// If no valid notes for device
-		if(!device["notes"].IsSequence() && !device["notes"] && !prog_settings::silent) {
-			std::cerr << "No valid notes found for " << device["device"] << '\n';
+		if(!device["notes"].IsSequence() && !device["notes"]) {
+			logger->error("No valid notes found for {}", device["device"].as<std::string>());
 			exit(EXIT_FAILURE);
 		}
 
@@ -138,17 +143,13 @@ void config::read() {
 				}
 				else {
 					// Print error light_mode not valid
-					if(!prog_settings::silent) {
-						std::cerr << "The light_mode is invalid for " << format_note(lows, highs) << '\n';
-						std::cerr << note["light_mode"] << " is not a valid value for light_mode\n";
-					}
+					logger->warn("The light_mode is invalid for {}", format_note(lows, highs));
+					logger->warn("{} is not a valid value for light_mode", note["light_mode"].as<std::string>());
 				}
 				// Warn if light value not in range
 				if(new_light_value > 255) {
-					if(!prog_settings::silent) {
-						std::cerr << "The light_value is invalid for " << format_note(lows, highs) << '\n';
-						std::cerr << new_light_value << " is not a valid light value\n";
-					}
+					logger->warn("The light_value is invalid for {}", format_note(lows, highs));
+					logger->warn("{} is not a valid light value", new_light_value);
 				}
 
 
@@ -186,9 +187,8 @@ void config::read() {
 					}
 					else {
 						// Print error light_mode used incorrectly
-						if(!prog_settings::silent) {
-							std::cerr << it_find->get_note() << " has a light mode with a corresponding note on, which has light_push\n" << it_find->get_note() << " should not have a light_mode, if using light_push on a corresponding note\n";
-						}
+						logger->warn("{} has a light mode with a corresponding note on, which has light_push", it_find->get_note());
+						logger->warn("{} should not have a light_mode, if using light_push on a corresponding note", it_find->get_note());
 					}
 				}
 				else {
@@ -262,14 +262,12 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 			int low = stoi_check(temp.substr(0, breakpos));
 			int high = stoi_check(temp.substr(breakpos + 2));
 
-			if(!prog_settings::silent) {
-				// Check for invalid values
-				if(low > 255 || low < 0) {
-					std::cerr << low << " is not a valid value for a note\n";
-				}
-				if( high > 255 || high < 0) {
-					std::cerr << high << " is not a valid value for a note\n";
-				}
+			// Check for invalid values
+			if(low > 255 || low < 0) {
+				logger->warn("{} is not a valid value for a note", low);
+			}
+			if( high > 255 || high < 0) {
+				logger->warn("{} is not a valid value for a note", high);
 			}
 
 			lows.push_back((unsigned char)low);
@@ -278,11 +276,10 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_n
 		// If string doesn't contain ".."
 		else {
 			int val = stoi_check(temp);
-			if(!prog_settings::silent) {
-				// Check for invalid value
-				if(val > 255 || val < 0) {
-					std::cerr << val << " is not a valid value for a note\n";
-				}
+
+			// Check for invalid value
+			if(val > 255 || val < 0) {
+				logger->warn("{} is not a valid value for a note", val);
 			}
 
 			lows.push_back((unsigned char)val);
@@ -297,12 +294,12 @@ unsigned int config::stoi_check(const std::string& s) {
 		return std::stoi(s);
 	}
 	catch(std::invalid_argument& e) {
-		std::cerr << s << " is not a valid value\n";
-		std::cerr << "returning 0 instead\n";
+		logger->warn("{} is not a valid value", s);
+		logger->warn("returning 0 instead");
 	}
 	catch(std::out_of_range& e) {
-		std::cerr << s << " is not with range\n";
-		std::cerr << "returning 0 instead\n";
+		logger->warn(" is not with range", s);
+		logger->warn("returning 0 instead");
 	}
 	return 0;
 }
