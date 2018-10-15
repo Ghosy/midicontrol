@@ -143,12 +143,12 @@ void config::read() {
 				}
 				else {
 					// Print error light_mode not valid
-					logger->warn("The light_mode is invalid for {}", format_note(lows, highs));
+					logger->warn("The light_mode is invalid for {}", note["note"].as<std::string>());
 					logger->warn("{} is not a valid value for light_mode", note["light_mode"].as<std::string>());
 				}
 				// Warn if light value not in range
 				if(new_light_value > 255) {
-					logger->warn("The light_value is invalid for {}", format_note(lows, highs));
+					logger->warn("The light_value is invalid for {}", note["note"].as<std::string>());
 					logger->warn("{} is not a valid light value", new_light_value);
 				}
 
@@ -213,23 +213,6 @@ void config::insert_note(std::vector<unsigned char> lows, std::vector<unsigned c
 	}
 }
 
-std::string config::format_note(std::vector<unsigned char> lows, std::vector<unsigned char> highs) {
-	std::ostringstream ostream;
-
-	for(int i = 0; i < 3; ++i) {
-		if(lows[i] == highs[i]) {
-			ostream << (int)lows[i];
-		}
-		else {
-			ostream << (int)lows[i] << ".." << (int)highs[i];
-		}
-		if(i < 2) {
-			ostream << ",";
-		}
-	}
-	return ostream.str();
-}
-
 void config::commandline_config(const char* conf_path) {
 	// Remove default configuration paths
 	config_file_path.clear();
@@ -238,14 +221,6 @@ void config::commandline_config(const char* conf_path) {
 
 std::string config::get_device() {
 	return midi_device;
-}
-
-std::string config::trim(std::string s) {
-	size_t startpos = s.find_first_not_of(" \n\r\t");
-	s = s.substr(startpos);
-	size_t endpos = s.find_last_not_of(" \n\r\t");
-	s = s.substr(0, endpos + 1);
-	return s;
 }
 
 std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_note(const std::string &note) {
@@ -304,8 +279,7 @@ unsigned int config::stoi_check(const std::string& s) {
 	return 0;
 }
 
-// I swear to god if these names aren't fix to be
-// less confusing soon, someone will get hurt.
+// TODO: Fix ambiguous naming
 namespace prog_settings {
 	bool quiet = false;
 	bool silent = false;
