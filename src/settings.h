@@ -22,6 +22,7 @@
 #define SETTINGS_H_
 
 #include <set>
+#include <spdlog/spdlog.h>
 
 #include "entry.h"
 
