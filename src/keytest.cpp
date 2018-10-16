@@ -120,6 +120,9 @@ int main(int argc, char* argv[]) {
 			list_ports();
 			exit(EXIT_SUCCESS);
 		}
+		else if(arg == "--no-log") {
+			logger->sinks()[1]->set_level(spdlog::level::off);
+		}
 		else if((arg == "-q") || (arg == "--quiet")) {
 			logger->sinks()[0]->set_level(spdlog::level::err);
 		}
@@ -291,6 +294,7 @@ void show_usage() {
 		<< "  -h, --help            Show this help message\n"
 		<< "  -i, --input=DEVICE    Print incoming midi notes from DEVICE\n"
 		<< "  -l, --list            List midi input/output ports\n"
+		<< "      --no-log          Turn off output to the log file\n"
 		<< "  -q, --quiet           Suppress normal output when reading midi input\n"
 		<< "  -s, --silent          Suppress normal output and suppress errors\n"
 		<< "      --version         Show version information\n"

@@ -27,6 +27,7 @@ _midicontrol() {
 			--help
 			--input
 			--list
+			--no-log
 			--quiet
 			--version
 			--verbose"
