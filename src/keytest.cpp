@@ -22,7 +22,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <signal.h>
-#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
@@ -51,7 +51,7 @@ int main(int argc, char* argv[]) {
 		console_sink->set_level(spdlog::level::info);
 		console_sink->set_pattern("[%^%l%$] %v");
 
-		auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>(settings.log_path, true);
+		auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(settings.log_path, (1024 * 1024), 3);
 		file_sink->set_level(spdlog::level::trace);
 		file_sink->set_pattern("[%Y-%m-%d %T.%e] [%l] %v");
 
