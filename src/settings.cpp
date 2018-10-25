@@ -283,7 +283,6 @@ unsigned int config::stoi_check(const std::string& s) {
 namespace prog_settings {
 	bool quiet = false;
 	bool silent = false;
-	bool verbose = false;
 	unsigned int delay = 50;
 }
 /* vim: set ts=8 sw=8 tw=0 noet :*/
