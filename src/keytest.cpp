@@ -41,7 +41,10 @@ RtMidiOut *midiout;
 std::shared_ptr<spdlog::logger> logger;
 bool done;
 
-static void finish(int){ done = true; }
+static void finish(int){
+	logger->debug("---Exiting midicontrol");
+	done = true;
+}
 
 int main(int argc, char* argv[]) {
 	// Setup logger
@@ -147,6 +150,7 @@ int main(int argc, char* argv[]) {
 }
 
 void scan_ports() {
+	logger->debug("---Starting midicontrol");
 	settings.read();
 
 	try {
