@@ -17,7 +17,7 @@ DOCSDIR := doc
 TESTDIR := tests
 
 # Libraries linked to exec
-LIBS = -lrtmidi -lboost_regex -lyaml-cpp
+LIBS = -lrtmidi -lboost_regex -lyaml-cpp -lpthread
 
 # Source extension
 SRCEXT := cpp

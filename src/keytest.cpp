@@ -30,6 +30,7 @@
 #include <sys/prctl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <thread>
 #include <unistd.h>
 
 #include "keytest.h"
@@ -167,7 +168,7 @@ void scan_ports() {
 	unsigned int nPorts = midiin->getPortCount();
 	if(nPorts == 0) {
 		logger->error("No ports available!\n");
-		goto cleanup;
+		clean_up();
 	}
 	// Go threw ports and open the configured device
 	for(unsigned int i = 0; i < nPorts; i++) {
@@ -188,22 +189,19 @@ void scan_ports() {
 	// Set callback function
 	// Make sure this always follows opening of port
 	// to prevent messages ending up in queue
-	midiin->setCallback(&midi_read);
+	 midiin->setCallback(&midi_read);
 	// Don't ignore sysex, timing, or active sensing messages.
 	midiin->ignoreTypes(false, false, false);
 	// Install an interrupt handler function.
 	done = false;
 	(void) signal(SIGINT, finish);
 	// Start light_mode checker
-	light_state_check();
+	std::thread light_loop(light_state_loop);
 	logger->info("Reading MIDI from port ... quit with Ctrl-C.");
 	while(!done) {
 		usleep(10000);
 	}
-	// Clean up
-cleanup:
-	delete midiin;
-	delete midiout;
+	clean_up();
 }
 
 void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
@@ -339,7 +337,7 @@ void list_ports() {
 		}
 		catch (RtMidiError &error) {
 			error.printMessage();
-			goto cleanup;
+			clean_up();
 		}
 		std::cout << "  Input Port #" << i << ": " << portName << '\n';
 	}
@@ -360,19 +358,16 @@ void list_ports() {
 		}
 		catch (RtMidiError &error) {
 			error.printMessage();
-			goto cleanup;
+			clean_up();
 		}
 		std::cout << "  Output Port #" << i << ": " << portName << '\n';
 	}
 	std::cout << '\n';
-	// Clean up
-cleanup:
-	delete midiin;
-	delete midiout;
+	clean_up();
 }
 
 void input_scan(const std::string &device) {
-	RtMidiIn  *midiin = nullptr;
+	RtMidiIn *midiin = nullptr;
 
 	try {
 		midiin = new RtMidiIn();
@@ -387,7 +382,7 @@ void input_scan(const std::string &device) {
 	unsigned int nPorts = midiin->getPortCount();
 	if(nPorts == 0) {
 		std::cout << "No ports available!\n";
-		goto cleanup;
+		clean_up();
 	}
 	// Go threw ports and open the configured device
 	for(unsigned int i = 0; i < nPorts; i++) {
@@ -417,9 +412,7 @@ void input_scan(const std::string &device) {
 	while(!done) {
 		usleep(10000);
 	}
-	// Clean up
-cleanup:
-	delete midiin;
+	clean_up();
 }
 
 void input_read(double, std::vector<unsigned char> *note_raw, void *) {
@@ -428,7 +421,7 @@ void input_read(double, std::vector<unsigned char> *note_raw, void *) {
 	std::cout << "Note: " << temp_entry.get_note() << std::endl;
 }
 
-void light_state_check() {
+void light_state_loop() {
 	std::set<Entry> check_list;
 	std::set<Entry> var_list;
 	// Filter out entries with LIGHT_CHECK
@@ -437,66 +430,57 @@ void light_state_check() {
 	// Filter out entries with LIGHT_VAR
 	std::copy_if(settings.note_list.begin(), settings.note_list.end(), std::inserter(var_list, var_list.end()), [](const Entry e){return (e.light_mode == LightMode::LIGHT_VAR);});
 
-	// Fork for checker child
-	pid_t pid_checker = fork();
+	while(!done) {
+		for(auto e: check_list) {
+			int ret;
+			std::vector<unsigned char> message;
 
-	if(pid_checker < 0) {
-		perror("Fork failed");
+			// Get exit status of light_command
+			// TODO: Make this section consider verbosity
+			ret = WEXITSTATUS(system(e.light_command.c_str()));
+
+			// Positive response(grep found)
+			if(ret == 0) {
+				// Turn on led
+				note_send({e.note[0], e.note[1], (unsigned char)e.light_value});
+			}
+			// Negative response(grep failed to find)
+			else if(ret == 1) {
+				// Turn off led
+				note_send({e.note[0], e.note[1], 0});
+			}
+			// Command exited with neither 1 nor 0
+			else {
+				logger->error("Unexpected return for light check on ", e.get_note());
+			}
+		}
+
+		for(auto e: var_list) {
+			std::string data;
+			FILE * stream;
+			// Only get stdout
+			std::string command = e.light_command.append(" 2>&1");
+
+			stream = popen(command.c_str(), "r");
+			if(stream) {
+				const int max_buffer = 256;
+				char buffer[max_buffer] = "";
+
+				while(!feof(stream)) {
+					if(fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
+				}
+
+				pclose(stream);
+			}
+			unsigned char new_light_value = std::stoi(data);
+
+			note_send({e.note[0], e.note[1], new_light_value});
+		}
+		// wait for delay time
+		usleep(prog_settings::delay * 1000);
 	}
-	if(pid_checker == 0) {
-		// Ensure child exits upon parent death
-		prctl(PR_SET_PDEATHSIG, SIGHUP);
-		while(!done) {
-			for(auto e: check_list) {
-				int ret;
-				std::vector<unsigned char> message;
-
-				// Get exit status of light_command
-				// TODO: Make this section consider verbosity
-				ret = WEXITSTATUS(system(e.light_command.c_str()));
-
-				// Positive response(grep found)
-				if(ret == 0) {
-					// Turn on led
-					note_send({e.note[0], e.note[1], (unsigned char)e.light_value});
-				}
-				// Negative response(grep failed to find)
-				else if(ret == 1) {
-					// Turn off led
-					note_send({e.note[0], e.note[1], 0});
-				}
-				// Command exited with neither 1 nor 0
-				else {
-					logger->error("Unexpected return for light check on ", e.get_note());
-				}
-
-			}
-
-			for(auto e: var_list) {
-				std::string data;
-				FILE * stream;
-				// Only get stdout
-				std::string command = e.light_command.append(" 2>&1");
-
-				stream = popen(command.c_str(), "r");
-				if(stream) {
-					const int max_buffer = 256;
-					char buffer[max_buffer] = "";
-
-					while(!feof(stream))
-						if(fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
-					pclose(stream);
-				}
-				unsigned char new_light_value = std::stoi(data);
-
-				note_send({e.note[0], e.note[1], new_light_value});
-			}
-			// wait for delay time
-			usleep(prog_settings::delay * 1000);
-		}
-		if(done) {
-			exit(EXIT_SUCCESS);
-		}
+	if(done) {
+		exit(EXIT_SUCCESS);
 	}
 }
 
@@ -514,5 +498,10 @@ void note_send(const std::vector<unsigned char> &note) {
 
 	Entry temp_entry(note, "");
 	logger->debug("Note sent: {}", temp_entry.get_note());
+}
+
+void clean_up() {
+	delete midiin;
+	delete midiout;
 }
 /* vim: set ts=8 sw=8 tw=0 noet :*/

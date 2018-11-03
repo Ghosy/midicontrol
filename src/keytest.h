@@ -62,9 +62,9 @@ void input_scan(const std::string &device);
 void input_read(double deltatime, std::vector<unsigned char> *note_raw, void *userdata);
 
 /**
- * @brief Start the checker for notes with light_mode of LIGHT_CHECK
+ * @brief Start the checker for notes with light_mode of LIGHT_CHECK and LIGHT_VAR
  */
-void light_state_check();
+void light_state_loop();
 
 /**
  * @brief Replace occurrences of NOTE and NOTE% with corresponding value
@@ -75,6 +75,11 @@ std::string note_replace(std::string s, unsigned int note);
  * @brief Send midi note back to the device
  */
 void note_send(const std::vector<unsigned char> &note);
+
+/**
+ * @brief Clean up allocated memory
+ */
+void clean_up();
 
 #endif
 /* vim: set ts=8 sw=8 tw=0 noet :*/
