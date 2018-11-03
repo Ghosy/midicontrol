@@ -169,6 +169,7 @@ void scan_ports() {
 	if(nPorts == 0) {
 		logger->error("No ports available!\n");
 		clean_up();
+		exit(EXIT_SUCCESS);
 	}
 	// Go threw ports and open the configured device
 	for(unsigned int i = 0; i < nPorts; i++) {
@@ -201,6 +202,8 @@ void scan_ports() {
 	while(!done) {
 		usleep(10000);
 	}
+
+	// Wait for light loop to finish
 	light_loop.join();
 	clean_up();
 }
@@ -339,6 +342,7 @@ void list_ports() {
 		catch (RtMidiError &error) {
 			error.printMessage();
 			clean_up();
+			exit(EXIT_FAILURE);
 		}
 		std::cout << "  Input Port #" << i << ": " << portName << '\n';
 	}
@@ -360,6 +364,7 @@ void list_ports() {
 		catch (RtMidiError &error) {
 			error.printMessage();
 			clean_up();
+			exit(EXIT_FAILURE);
 		}
 		std::cout << "  Output Port #" << i << ": " << portName << '\n';
 	}
@@ -384,6 +389,7 @@ void input_scan(const std::string &device) {
 	if(nPorts == 0) {
 		std::cout << "No ports available!\n";
 		clean_up();
+		exit(EXIT_SUCCESS);
 	}
 	// Go threw ports and open the configured device
 	for(unsigned int i = 0; i < nPorts; i++) {
