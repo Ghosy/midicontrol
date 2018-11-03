@@ -201,6 +201,7 @@ void scan_ports() {
 	while(!done) {
 		usleep(10000);
 	}
+	light_loop.join();
 	clean_up();
 }
 
@@ -478,9 +479,6 @@ void light_state_loop() {
 		}
 		// wait for delay time
 		usleep(prog_settings::delay * 1000);
-	}
-	if(done) {
-		exit(EXIT_SUCCESS);
 	}
 }
 
