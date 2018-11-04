@@ -437,6 +437,11 @@ void light_state_loop() {
 	// Filter out entries with LIGHT_VAR
 	std::copy_if(settings.note_list.begin(), settings.note_list.end(), std::inserter(var_list, var_list.end()), [](const Entry e){return (e.light_mode == LightMode::LIGHT_VAR);});
 
+	// If both lists are empty return as there is nothing to do
+	if(check_list.empty() && var_list.empty()) {
+		return;
+	}
+
 	while(!done) {
 		for(auto e: check_list) {
 			int ret;
