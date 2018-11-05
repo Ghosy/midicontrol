@@ -247,44 +247,44 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 			switch(match.light_mode) {
 				case LightMode::LIGHT_ON:
 				case LightMode::LIGHT_PUSH: {
-								    note_send({note_raw->at(0), note_raw->at(1), match.light_value});
-								    break;
-							    }
+					note_send({note_raw->at(0), note_raw->at(1), match.light_value});
+					break;
+				}
 				case LightMode::LIGHT_OFF: {
-								   note_send({note_raw->at(0), note_raw->at(1), 0});
-								   break;
-							   }
+					note_send({note_raw->at(0), note_raw->at(1), 0});
+					break;
+				}
 				case LightMode::LIGHT_WAIT: {
-								    note_send({note_raw->at(0), note_raw->at(1), match.light_value});
+					note_send({note_raw->at(0), note_raw->at(1), match.light_value});
 
-								    // Fork and wait for child executing command to exit
-								    pid_t pid_light = fork();
-								    if(pid_light < 0) {
-									    perror("Fork failed");
-								    }
-								    if(pid_light == 0) {
-									    // Wait for action to finish
-									    while(kill(pid, 0) == 0) {
-										    usleep(10000);
-									    }
-									    // Turn off led
-									    note_send({note_raw->at(0), note_raw->at(1), 0});
-									    _exit(0);
-								    }
-								    break;
-							    }
+					// Fork and wait for child executing command to exit
+					pid_t pid_light = fork();
+					if(pid_light < 0) {
+						perror("Fork failed");
+					}
+					if(pid_light == 0) {
+						// Wait for action to finish
+						while(kill(pid, 0) == 0) {
+							usleep(10000);
+						}
+						// Turn off led
+						note_send({note_raw->at(0), note_raw->at(1), 0});
+						_exit(0);
+					}
+					break;
+				}
 				case LightMode::LIGHT_CHECK: {
-								     // Do nothing this mode is not checked on note received
-								     break;
-							     }
+					// Do nothing this mode is not checked on note received
+					break;
+				}
 				case LightMode::LIGHT_VAR: {
-								   // Do nothing this mode is not checked on note received
-								   break;
-							   }
+					// Do nothing this mode is not checked on note received
+					break;
+				}
 				default: {
-						 logger->error("Non-conforming light_mode found for note, {}", match.get_note());
-						 break;
-					 }
+					logger->error("Non-conforming light_mode found for note, {}", match.get_note());
+					break;
+				}
 			}
 		}
 	}
