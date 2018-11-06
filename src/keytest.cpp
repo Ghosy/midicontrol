@@ -219,6 +219,10 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 
 	// For each matching note in conf
 	for(const auto &match: matches) {
+		logger->debug("Entry Note: {}  Executing: {}", temp_entry.get_note(), match.action);
+		// TODO: Should this be hardcoded with note[2]?
+		std::string command = note_replace(match.action, (int)temp_entry.note[2]);
+
 		// Ensure all children are reaped
 		signal(SIGCHLD, SIG_IGN);
 		// Fork for command to be run
@@ -231,9 +235,6 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 				int fd = open("/dev/null", O_WRONLY);
 				dup2(fd, 1);
 			}
-			logger->debug("Entry Note: {}  Executing: {}", temp_entry.get_note(), match.action);
-			// TODO: Should this be hardcoded with note[2]?
-			std::string command = note_replace(match.action, (int)temp_entry.note[2]);
 
 			// Do the action associated with the corresponding midi note
 			execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
