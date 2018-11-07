@@ -258,20 +258,15 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 				case LightMode::LIGHT_WAIT: {
 					note_send({note_raw->at(0), note_raw->at(1), match.light_value});
 
-					// Fork and wait for child executing command to exit
-					pid_t pid_light = fork();
-					if(pid_light < 0) {
-						perror("Fork failed");
-					}
-					if(pid_light == 0) {
+					std::thread t([](auto _pid, auto _note_raw) {
 						// Wait for action to finish
-						while(kill(pid, 0) == 0) {
+						while(kill(_pid, 0) == 0) {
 							usleep(10000);
 						}
 						// Turn off led
-						note_send({note_raw->at(0), note_raw->at(1), 0});
-						_exit(0);
-					}
+						note_send({_note_raw.at(0), _note_raw.at(1), 0});
+					}, pid, *note_raw);
+					t.detach();
 					break;
 				}
 				case LightMode::LIGHT_CHECK: {

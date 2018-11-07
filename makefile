@@ -1,7 +1,7 @@
 # Compiler
 CXX := g++
 # Compile-time flags
-CXXFLAGS := -std=c++11 -pedantic -Wall -Wextra -g3
+CXXFLAGS := -std=c++14 -pedantic -Wall -Wextra -g3
 
 # Source directory
 SRCDIR := src
