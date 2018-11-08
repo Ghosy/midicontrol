@@ -3,7 +3,7 @@
  * @brief Implementation of settings class for placeholder
  * @author Zachary Matthews
  *
- * Copyright(c) 2017 Zachary Matthews.
+ * Copyright(c) 2017-2018 Zachary Matthews.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -283,6 +283,7 @@ unsigned int config::stoi_check(const std::string& s) {
 namespace prog_settings {
 	bool quiet = false;
 	bool silent = false;
+	bool disable_lights = false;
 	unsigned int delay = 50;
 }
 /* vim: set ts=8 sw=8 tw=0 noet :*/

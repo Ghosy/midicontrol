@@ -3,7 +3,7 @@
  * @brief Implementation the main class for placeholder
  * @author Zachary Matthews
  *
- * Copyright(c) 2017 Zachary Matthews.
+ * Copyright(c) 2017-2018 Zachary Matthews.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -124,6 +124,9 @@ int main(int argc, char* argv[]) {
 			list_ports();
 			exit(EXIT_SUCCESS);
 		}
+		else if(arg == "--no-lights") {
+			prog_settings::disable_lights = true;
+		}
 		else if(arg == "--no-log") {
 			logger->sinks()[1]->set_level(spdlog::level::off);
 		}
@@ -195,8 +198,13 @@ void scan_ports() {
 	// Install an interrupt handler function.
 	done = false;
 	(void) signal(SIGINT, finish);
-	// Start light_mode checker
-	std::thread light_loop(light_state_loop);
+
+	std::thread light_loop;
+	if(!prog_settings::disable_lights) {
+		// Start light_mode checker
+		light_loop = std::thread(light_state_loop);
+	}
+
 	logger->info("Reading MIDI from port ... quit with Ctrl-C.");
 	while(!done) {
 		usleep(10000);
@@ -240,44 +248,47 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 			_exit(0);
 		}
 
-		// Led handling
-		if(match.light_mode != LightMode::NONE) {
-			switch(match.light_mode) {
-				case LightMode::LIGHT_ON:
-				case LightMode::LIGHT_PUSH: {
-					note_send({note_raw->at(0), note_raw->at(1), match.light_value});
-					break;
-				}
-				case LightMode::LIGHT_OFF: {
-					note_send({note_raw->at(0), note_raw->at(1), 0});
-					break;
-				}
-				case LightMode::LIGHT_WAIT: {
-					note_send({note_raw->at(0), note_raw->at(1), match.light_value});
+		// If light mode unneeded
+		if(match.light_mode == LightMode::NONE || prog_settings::disable_lights) {
+			return;
+		}
 
-					std::thread t([](auto _pid, auto _note_raw) {
-						// Wait for action to finish
-						while(kill(_pid, 0) == 0) {
-							usleep(10000);
-						}
-						// Turn off led
-						note_send({_note_raw.at(0), _note_raw.at(1), 0});
-					}, pid, *note_raw);
-					t.detach();
-					break;
-				}
-				case LightMode::LIGHT_CHECK: {
-					// Do nothing this mode is not checked on note received
-					break;
-				}
-				case LightMode::LIGHT_VAR: {
-					// Do nothing this mode is not checked on note received
-					break;
-				}
-				default: {
-					logger->error("Non-conforming light_mode found for note, {}", match.get_note());
-					break;
-				}
+		// Led handling
+		switch(match.light_mode) {
+			case LightMode::LIGHT_ON:
+			case LightMode::LIGHT_PUSH: {
+				note_send({note_raw->at(0), note_raw->at(1), match.light_value});
+				break;
+			}
+			case LightMode::LIGHT_OFF: {
+				note_send({note_raw->at(0), note_raw->at(1), 0});
+				break;
+			}
+			case LightMode::LIGHT_WAIT: {
+				note_send({note_raw->at(0), note_raw->at(1), match.light_value});
+
+				std::thread t([](auto _pid, auto _note_raw) {
+					// Wait for action to finish
+					while(kill(_pid, 0) == 0) {
+						usleep(10000);
+					}
+					// Turn off led
+					note_send({_note_raw.at(0), _note_raw.at(1), 0});
+				}, pid, *note_raw);
+				t.detach();
+				break;
+			}
+			case LightMode::LIGHT_CHECK: {
+				// Do nothing this mode is not checked on note received
+				break;
+			}
+			case LightMode::LIGHT_VAR: {
+				// Do nothing this mode is not checked on note received
+				break;
+			}
+			default: {
+				logger->error("Non-conforming light_mode found for note, {}", match.get_note());
+				break;
 			}
 		}
 	}

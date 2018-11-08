@@ -3,7 +3,7 @@
  * @brief Header of settings class for placeholder
  * @author Zachary Matthews
  *
- * Copyright(c) 2017 Zachary Matthews.
+ * Copyright(c) 2017-2018 Zachary Matthews.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,7 @@ namespace prog_settings {
 	extern bool quiet;
 	extern bool silent;
 	extern bool verbose;
+	extern bool disable_lights;
 	extern unsigned int delay;
 }
 

@@ -1,6 +1,6 @@
 .\" Manpage for midicontrol
 .\"
-.\" Copyright(c) 2017 Zachary Matthews.
+.\" Copyright(c) 2017-2018 Zachary Matthews.
 .\"
 .\" This program is free software: you can redistribute it and/or modify
 .\" it under the terms of the GNU General Public License as published by
@@ -15,7 +15,7 @@
 .\" You should have received a copy of the GNU General Public License
 .\" along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-.TH MIDICONTROL 1 "05 October 2018" "0.1" "midicontrol man page"
+.TH MIDICONTROL 1 "08 November 2018" "0.1" "midicontrol man page"
 .SH NAME
 midicontrol \- interpret midi commands into shell commands
 .SH SYNOPSIS
@@ -42,6 +42,9 @@ Print incoming midi notes from DEVICE
 .TP
 .BR \-l ", " \-\-list
 List midi input/output ports
+.TP
+.BR "" "   " \-\-no\-lights
+Turn off support for using lights(This will only improve performance if your config contains and uses light settings)
 .TP
 .BR "" "   " \-\-no\-log
 Turn off output to the log file
