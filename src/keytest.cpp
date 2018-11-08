@@ -162,7 +162,6 @@ void scan_ports() {
 		error.printMessage();
 		exit(EXIT_FAILURE);
 	}
-	std::vector<unsigned char> message;
 
 	// Check available ports.
 	unsigned int nPorts = midiin->getPortCount();
@@ -243,8 +242,6 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 
 		// Led handling
 		if(match.light_mode != LightMode::NONE) {
-			std::vector<unsigned char> message;
-
 			switch(match.light_mode) {
 				case LightMode::LIGHT_ON:
 				case LightMode::LIGHT_PUSH: {
@@ -378,7 +375,6 @@ void input_scan(const std::string &device) {
 		error.printMessage();
 		exit(EXIT_FAILURE);
 	}
-	std::vector<unsigned char> message;
 
 	// Check available ports.
 	unsigned int nPorts = midiin->getPortCount();
@@ -441,8 +437,6 @@ void light_state_loop() {
 	while(!done) {
 		for(auto e: check_list) {
 			int ret;
-			std::vector<unsigned char> message;
-
 			// Get exit status of light_command
 			// TODO: Make this section consider verbosity
 			ret = WEXITSTATUS(system(e.light_command.c_str()));
