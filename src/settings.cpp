@@ -104,59 +104,59 @@ void config::read() {
 
 			std::string new_command = note["command"].as<std::string>();
 
-			// If there are light settings
-			if(note["light_mode"]) {
-				LightMode new_mode = LightMode::LIGHT_OFF;
-				unsigned int new_light_value = 0;
-				std::string new_light_command;
+			// If there aren't light settings
+			if(!note["light_mode"]) {
+				insert_note(lows, highs, new_command, LightMode::NONE, 0, "");
+				continue;
+			}
 
-				std::string temp_mode = note["light_mode"].as<std::string>();
-				// To lower temp_mode
-				transform(temp_mode.begin(), temp_mode.end(), temp_mode.begin(), ::tolower);
+			LightMode new_mode = LightMode::LIGHT_OFF;
+			unsigned int new_light_value = 0;
+			std::string new_light_command;
 
-				// Find correct light mode
-				if(temp_mode == "light_push") {
-					new_mode = LightMode::LIGHT_PUSH;
-					new_light_value = note["light_value"].as<unsigned int>();
-				}
-				else if(temp_mode == "light_on") {
-					new_mode = LightMode::LIGHT_ON;
-					new_light_value = note["light_value"].as<unsigned int>();
-				}
-				else if(temp_mode == "light_off") {
-					new_mode = LightMode::LIGHT_OFF;
-					new_light_value = 0;
-				}
-				else if(temp_mode == "light_wait") {
-					new_mode = LightMode::LIGHT_WAIT;
-					new_light_value = note["light_value"].as<unsigned int>();
-				}
-				else if(temp_mode == "light_check") {
-					new_mode = LightMode::LIGHT_CHECK;
-					new_light_value = note["light_value"].as<unsigned int>();
-					new_light_command = note["light_command"].as<std::string>();
-				}
-				else if(temp_mode == "light_var") {
-					new_mode = LightMode::LIGHT_VAR;
-					new_light_value = 0;
-					new_light_command = note["light_command"].as<std::string>();
-				}
-				else {
-					// Print error light_mode not valid
-					logger->warn("The light_mode is invalid for {}", note["note"].as<std::string>());
-					logger->warn("{} is not a valid value for light_mode", note["light_mode"].as<std::string>());
-				}
-				// Warn if light value not in range
-				if(new_light_value > 255) {
-					logger->warn("The light_value is invalid for {}", note["note"].as<std::string>());
-					logger->warn("{} is not a valid light value", new_light_value);
-				}
+			std::string temp_mode = note["light_mode"].as<std::string>();
+			// To lower temp_mode
+			transform(temp_mode.begin(), temp_mode.end(), temp_mode.begin(), ::tolower);
 
-
-				insert_note(lows, highs, new_command, new_mode, (unsigned char)new_light_value, new_light_command);
+			// Find correct light mode
+			if(temp_mode == "light_push") {
+				new_mode = LightMode::LIGHT_PUSH;
+				new_light_value = note["light_value"].as<unsigned int>();
+			}
+			else if(temp_mode == "light_on") {
+				new_mode = LightMode::LIGHT_ON;
+				new_light_value = note["light_value"].as<unsigned int>();
+			}
+			else if(temp_mode == "light_off") {
+				new_mode = LightMode::LIGHT_OFF;
+				new_light_value = 0;
+			}
+			else if(temp_mode == "light_wait") {
+				new_mode = LightMode::LIGHT_WAIT;
+				new_light_value = note["light_value"].as<unsigned int>();
+			}
+			else if(temp_mode == "light_check") {
+				new_mode = LightMode::LIGHT_CHECK;
+				new_light_value = note["light_value"].as<unsigned int>();
+				new_light_command = note["light_command"].as<std::string>();
+			}
+			else if(temp_mode == "light_var") {
+				new_mode = LightMode::LIGHT_VAR;
+				new_light_value = 0;
+				new_light_command = note["light_command"].as<std::string>();
 			}
 			else {
-				insert_note(lows, highs, new_command, LightMode::NONE, 0, "");
+				// Print error light_mode not valid
+				logger->warn("The light_mode is invalid for {}", note["note"].as<std::string>());
+				logger->warn("{} is not a valid value for light_mode", note["light_mode"].as<std::string>());
+			}
+			// Warn if light value not in range
+			if(new_light_value > 255) {
+				logger->warn("The light_value is invalid for {}", note["note"].as<std::string>());
+				logger->warn("{} is not a valid light value", new_light_value);
+			}
+
+			insert_note(lows, highs, new_command, new_mode, (unsigned char)new_light_value, new_light_command);
 			}
 		}
 	}
