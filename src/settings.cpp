@@ -94,70 +94,8 @@ void config::read() {
 		}
 
 		// Each note for device
-		for(YAML::Node note: device["notes"]) {
-			Entry new_entry;
-
-			// Break up note and place into vectors
-			auto vals = config::read_note(note["note"].as<std::string>());
-			std::vector<unsigned char> lows = vals.first;
-			std::vector<unsigned char> highs = vals.second;
-
-			std::string new_command = note["command"].as<std::string>();
-
-			// If there aren't light settings
-			if(!note["light_mode"]) {
-				insert_note(lows, highs, new_command, LightMode::NONE, 0, "");
-				continue;
-			}
-
-			LightMode new_mode = LightMode::LIGHT_OFF;
-			unsigned int new_light_value = 0;
-			std::string new_light_command;
-
-			std::string temp_mode = note["light_mode"].as<std::string>();
-			// To lower temp_mode
-			transform(temp_mode.begin(), temp_mode.end(), temp_mode.begin(), ::tolower);
-
-			// Find correct light mode
-			if(temp_mode == "light_push") {
-				new_mode = LightMode::LIGHT_PUSH;
-				new_light_value = note["light_value"].as<unsigned int>();
-			}
-			else if(temp_mode == "light_on") {
-				new_mode = LightMode::LIGHT_ON;
-				new_light_value = note["light_value"].as<unsigned int>();
-			}
-			else if(temp_mode == "light_off") {
-				new_mode = LightMode::LIGHT_OFF;
-				new_light_value = 0;
-			}
-			else if(temp_mode == "light_wait") {
-				new_mode = LightMode::LIGHT_WAIT;
-				new_light_value = note["light_value"].as<unsigned int>();
-			}
-			else if(temp_mode == "light_check") {
-				new_mode = LightMode::LIGHT_CHECK;
-				new_light_value = note["light_value"].as<unsigned int>();
-				new_light_command = note["light_command"].as<std::string>();
-			}
-			else if(temp_mode == "light_var") {
-				new_mode = LightMode::LIGHT_VAR;
-				new_light_value = 0;
-				new_light_command = note["light_command"].as<std::string>();
-			}
-			else {
-				// Print error light_mode not valid
-				logger->warn("The light_mode is invalid for {}", note["note"].as<std::string>());
-				logger->warn("{} is not a valid value for light_mode", note["light_mode"].as<std::string>());
-			}
-			// Warn if light value not in range
-			if(new_light_value > 255) {
-				logger->warn("The light_value is invalid for {}", note["note"].as<std::string>());
-				logger->warn("{} is not a valid light value", new_light_value);
-			}
-
-			insert_note(lows, highs, new_command, new_mode, (unsigned char)new_light_value, new_light_command);
-			}
+		for(YAML::Node yaml_entry: device["notes"]) {
+			read_entry(yaml_entry);
 		}
 	}
 
@@ -200,6 +138,71 @@ void config::read() {
 	}
 }
 
+void config::read_entry(YAML::Node yaml_entry) {
+	Entry new_entry;
+
+	// Break up note and place into vectors
+	auto vals = config::parse_note(yaml_entry["note"].as<std::string>());
+	std::vector<unsigned char> lows = vals.first;
+	std::vector<unsigned char> highs = vals.second;
+
+	std::string new_command = yaml_entry["command"].as<std::string>();
+
+	// If there aren't light settings, function is finished
+	if(!yaml_entry["light_mode"]) {
+		insert_note(lows, highs, new_command, LightMode::NONE, 0, "");
+		return;
+	}
+
+	LightMode new_mode = LightMode::LIGHT_OFF;
+	unsigned int new_light_value = 0;
+	std::string new_light_command;
+
+	std::string temp_mode = yaml_entry["light_mode"].as<std::string>();
+	// To lower temp_mode
+	transform(temp_mode.begin(), temp_mode.end(), temp_mode.begin(), ::tolower);
+
+	// Find correct light mode
+	if(temp_mode == "light_push") {
+		new_mode = LightMode::LIGHT_PUSH;
+		new_light_value = yaml_entry["light_value"].as<unsigned int>();
+	}
+	else if(temp_mode == "light_on") {
+		new_mode = LightMode::LIGHT_ON;
+		new_light_value = yaml_entry["light_value"].as<unsigned int>();
+	}
+	else if(temp_mode == "light_off") {
+		new_mode = LightMode::LIGHT_OFF;
+		new_light_value = 0;
+	}
+	else if(temp_mode == "light_wait") {
+		new_mode = LightMode::LIGHT_WAIT;
+		new_light_value = yaml_entry["light_value"].as<unsigned int>();
+	}
+	else if(temp_mode == "light_check") {
+		new_mode = LightMode::LIGHT_CHECK;
+		new_light_value = yaml_entry["light_value"].as<unsigned int>();
+		new_light_command = yaml_entry["light_command"].as<std::string>();
+	}
+	else if(temp_mode == "light_var") {
+		new_mode = LightMode::LIGHT_VAR;
+		new_light_value = 0;
+		new_light_command = yaml_entry["light_command"].as<std::string>();
+	}
+	else {
+		// Print error light_mode not valid
+		logger->warn("The light_mode is invalid for {}", yaml_entry["note"].as<std::string>());
+		logger->warn("{} is not a valid value for light_mode", yaml_entry["light_mode"].as<std::string>());
+	}
+	// Warn if light value not in range
+	if(new_light_value > 255) {
+		logger->warn("The light_value is invalid for {}", yaml_entry["note"].as<std::string>());
+		logger->warn("{} is not a valid light value", new_light_value);
+	}
+
+	insert_note(lows, highs, new_command, new_mode, (unsigned char)new_light_value, new_light_command);
+}
+
 void config::insert_note(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string action, LightMode mode, unsigned int light_value, std::string light_command) {
 	Entry new_entry;
 	for(unsigned char i = lows[0]; i <= highs[0]; ++i) {
@@ -223,7 +226,7 @@ std::string config::get_device() {
 	return midi_device;
 }
 
-std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::read_note(const std::string &note) {
+std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::parse_note(const std::string &note) {
 	std::vector<unsigned char> lows;
 	std::vector<unsigned char> highs;
 	std::string temp;

@@ -23,6 +23,7 @@
 
 #include <set>
 #include <spdlog/spdlog.h>
+#include <yaml-cpp/yaml.h>
 
 #include "entry.h"
 
@@ -37,10 +38,11 @@ struct config {
 	std::string get_device();
 
 private:
+	void read_entry(YAML::Node);
 	std::vector<std::string> config_file_path;
 	std::string midi_device;
 	void insert_note(std::vector<unsigned char>, std::vector<unsigned char>, std::string, LightMode, unsigned int, std::string);
-	std::pair<std::vector<unsigned char>, std::vector<unsigned char>> read_note(const std::string &);
+	std::pair<std::vector<unsigned char>, std::vector<unsigned char>> parse_note(const std::string &);
 	unsigned int stoi_check(const std::string&);
 	std::shared_ptr<spdlog::logger> logger;
 };
