@@ -39,6 +39,7 @@ struct config {
 
 private:
 	void read_entry(YAML::Node);
+	void create_off_entries();
 	std::vector<std::string> config_file_path;
 	std::string midi_device;
 	void insert_note(std::vector<unsigned char>, std::vector<unsigned char>, std::string, LightMode, unsigned int, std::string);

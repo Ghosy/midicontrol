@@ -100,42 +100,7 @@ void config::read() {
 	}
 
 	// Look through all entries for LIGHT_PUSH missing LIGHT_OFF
-	// TODO: Try and clean this up. It's a mess
-	for(auto it = note_list.begin(); it != note_list.end(); ++it) {
-		if(it->light_mode == LightMode::LIGHT_PUSH) {
-			// Try to find midi note off, aka xx,xx,00
-			Entry off_entry1({it->note[0], it->note[1], 0}, "");
-			// Try to find midi note off, aka xx-16,xx,xx
-			Entry off_entry2({static_cast<unsigned char>(it->note[0] - 16), it->note[1], it->note[2]}, "");
-
-			std::vector<Entry> off_entries = {off_entry1, off_entry2};
-
-			for(const auto &off_entry: off_entries) {
-				auto it_find = settings.note_list.find(off_entry);
-
-				// If off note found
-				if(it_find != settings.note_list.end()) {
-					// Modify entry for found
-					if(it_find->light_mode == LightMode::NONE) {
-						// Create modified version of found
-						Entry new_entry(it_find->note, it_find->action, LightMode::LIGHT_OFF, (unsigned char)0);
-						// Remove found and insert modified
-						note_list.erase(it_find);
-						note_list.insert(new_entry);
-					}
-					else {
-						// Print error light_mode used incorrectly
-						logger->warn("{} has a light mode with a corresponding note on, which has light_push", it_find->get_note());
-						logger->warn("{} should not have a light_mode, if using light_push on a corresponding note", it_find->get_note());
-					}
-				}
-				else {
-					Entry new_entry(off_entry.note, "", LightMode::LIGHT_OFF, (unsigned char)0);
-					note_list.insert(new_entry);
-				}
-			}
-		}
-	}
+	create_off_entries();
 }
 
 void config::read_entry(YAML::Node yaml_entry) {
@@ -201,6 +166,45 @@ void config::read_entry(YAML::Node yaml_entry) {
 	}
 
 	insert_note(lows, highs, new_command, new_mode, (unsigned char)new_light_value, new_light_command);
+}
+
+// TODO: Try and clean this up. It's a mess
+void config::create_off_entries() {
+	for(auto it = note_list.begin(); it != note_list.end(); ++it) {
+		if(it->light_mode == LightMode::LIGHT_PUSH) {
+			// Try to find midi note off, aka xx,xx,00
+			Entry off_entry1({it->note[0], it->note[1], 0}, "");
+			// Try to find midi note off, aka xx-16,xx,xx
+			Entry off_entry2({static_cast<unsigned char>(it->note[0] - 16), it->note[1], it->note[2]}, "");
+
+			std::vector<Entry> off_entries = {off_entry1, off_entry2};
+
+			for(const auto &off_entry: off_entries) {
+				auto it_find = settings.note_list.find(off_entry);
+
+				// If off note found
+				if(it_find != settings.note_list.end()) {
+					// Modify entry for found
+					if(it_find->light_mode == LightMode::NONE) {
+						// Create modified version of found
+						Entry new_entry(it_find->note, it_find->action, LightMode::LIGHT_OFF, (unsigned char)0);
+						// Remove found and insert modified
+						note_list.erase(it_find);
+						note_list.insert(new_entry);
+					}
+					else {
+						// Print error light_mode used incorrectly
+						logger->warn("{} has a light mode with a corresponding note on, which has light_push", it_find->get_note());
+						logger->warn("{} should not have a light_mode, if using light_push on a corresponding note", it_find->get_note());
+					}
+				}
+				else {
+					Entry new_entry(off_entry.note, "", LightMode::LIGHT_OFF, (unsigned char)0);
+					note_list.insert(new_entry);
+				}
+			}
+		}
+	}
 }
 
 void config::insert_note(std::vector<unsigned char> lows, std::vector<unsigned char> highs, std::string action, LightMode mode, unsigned int light_value, std::string light_command) {
