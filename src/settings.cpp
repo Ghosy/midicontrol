@@ -170,12 +170,12 @@ void config::read_entry(YAML::Node yaml_entry) {
 
 // TODO: Try and clean this up. It's a mess
 void config::create_off_entries() {
-	for(auto it = note_list.begin(); it != note_list.end(); ++it) {
-		if(it->light_mode == LightMode::LIGHT_PUSH) {
+	for(const auto &entry: note_list) {
+		if(entry.light_mode == LightMode::LIGHT_PUSH) {
 			// Try to find midi note off, aka xx,xx,00
-			Entry off_entry1({it->note[0], it->note[1], 0}, "");
+			Entry off_entry1({entry.note[0], entry.note[1], 0}, "");
 			// Try to find midi note off, aka xx-16,xx,xx
-			Entry off_entry2({static_cast<unsigned char>(it->note[0] - 16), it->note[1], it->note[2]}, "");
+			Entry off_entry2({static_cast<unsigned char>(entry.note[0] - 16), entry.note[1], entry.note[2]}, "");
 
 			std::vector<Entry> off_entries = {off_entry1, off_entry2};
 
