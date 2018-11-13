@@ -278,10 +278,7 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 				t.detach();
 				break;
 			}
-			case LightMode::LIGHT_CHECK: {
-				// Do nothing this mode is not checked on note received
-				break;
-			}
+			case LightMode::LIGHT_CHECK:
 			case LightMode::LIGHT_VAR: {
 				// Do nothing this mode is not checked on note received
 				break;
