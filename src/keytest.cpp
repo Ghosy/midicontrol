@@ -248,9 +248,9 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 			_exit(0);
 		}
 
-		// If light mode unneeded
+		// If light handling unneeded; skip it
 		if(match.light_mode == LightMode::NONE || prog_settings::disable_lights) {
-			return;
+			continue;
 		}
 
 		// Led handling
