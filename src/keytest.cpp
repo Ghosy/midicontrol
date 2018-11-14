@@ -217,76 +217,75 @@ void scan_ports() {
 
 void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 	Entry temp_entry(*note_raw, "");
+	auto match = settings.note_list.find(temp_entry);
 
 	logger->debug("Incoming note: {}", temp_entry.get_note());
 
-	// Find matches to incoming note
-	std::vector<Entry> matches;
-	std::copy_if(settings.note_list.begin(), settings.note_list.end(), std::back_inserter(matches), [temp_entry](Entry e){return e == temp_entry;});
+	// If match not found; nothing to do
+	if(match == settings.note_list.end()) {
+		return;
+	}
 
-	// For each matching note in conf
-	for(const auto &match: matches) {
-		logger->debug("Entry Note: {}  Executing: {}", temp_entry.get_note(), match.action);
-		// TODO: Should this be hardcoded with note[2]?
-		std::string command = note_replace(match.action, (int)temp_entry.note[2]);
+	logger->debug("Entry Note: {}  Executing: {}", temp_entry.get_note(), match->action);
+	// TODO: Should this be hardcoded with note[2]?
+	std::string command = note_replace(match->action, (int)temp_entry.note[2]);
 
-		// Ensure all children are reaped
-		signal(SIGCHLD, SIG_IGN);
-		// Fork for command to be run
-		pid_t pid = fork();
-		if(pid < 0) {
-			perror("Fork failed");
-		}
-		if(pid == 0) {
-			if(prog_settings::quiet || prog_settings::silent) {
-				int fd = open("/dev/null", O_WRONLY);
-				dup2(fd, 1);
-			}
-
-			// Do the action associated with the corresponding midi note
-			execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
-			_exit(0);
+	// Ensure all children are reaped
+	signal(SIGCHLD, SIG_IGN);
+	// Fork for command to be run
+	pid_t pid = fork();
+	if(pid < 0) {
+		perror("Fork failed");
+	}
+	if(pid == 0) {
+		if(prog_settings::quiet || prog_settings::silent) {
+			int fd = open("/dev/null", O_WRONLY);
+			dup2(fd, 1);
 		}
 
-		// If light handling unneeded; skip it
-		if(match.light_mode == LightMode::NONE || prog_settings::disable_lights) {
-			continue;
+		// Do the action associated with the corresponding midi note
+		execl("/bin/sh", "sh", "-c", command.c_str(), NULL);
+		_exit(0);
+	}
+
+	// If light handling unneeded; skip
+	if(match->light_mode == LightMode::NONE || prog_settings::disable_lights) {
+		return;
+	}
+
+	// Led handling
+	switch(match->light_mode) {
+		case LightMode::LIGHT_ON:
+		case LightMode::LIGHT_PUSH: {
+			note_send({note_raw->at(0), note_raw->at(1), match->light_value});
+			break;
 		}
+		case LightMode::LIGHT_OFF: {
+			note_send({note_raw->at(0), note_raw->at(1), 0});
+			break;
+		}
+		case LightMode::LIGHT_WAIT: {
+			note_send({note_raw->at(0), note_raw->at(1), match->light_value});
 
-		// Led handling
-		switch(match.light_mode) {
-			case LightMode::LIGHT_ON:
-			case LightMode::LIGHT_PUSH: {
-				note_send({note_raw->at(0), note_raw->at(1), match.light_value});
-				break;
-			}
-			case LightMode::LIGHT_OFF: {
-				note_send({note_raw->at(0), note_raw->at(1), 0});
-				break;
-			}
-			case LightMode::LIGHT_WAIT: {
-				note_send({note_raw->at(0), note_raw->at(1), match.light_value});
-
-				std::thread t([](auto _pid, auto _note_raw) {
-					// Wait for action to finish
-					while(kill(_pid, 0) == 0) {
-						usleep(10000);
-					}
-					// Turn off led
-					note_send({_note_raw.at(0), _note_raw.at(1), 0});
-				}, pid, *note_raw);
-				t.detach();
-				break;
-			}
-			case LightMode::LIGHT_CHECK:
-			case LightMode::LIGHT_VAR: {
-				// Do nothing this mode is not checked on note received
-				break;
-			}
-			default: {
-				logger->error("Non-conforming light_mode found for note, {}", match.get_note());
-				break;
-			}
+			std::thread t([](auto _pid, auto _note_raw) {
+				// Wait for action to finish
+				while(kill(_pid, 0) == 0) {
+					usleep(10000);
+				}
+				// Turn off led
+				note_send({_note_raw.at(0), _note_raw.at(1), 0});
+			}, pid, *note_raw);
+			t.detach();
+			break;
+		}
+		case LightMode::LIGHT_CHECK:
+		case LightMode::LIGHT_VAR: {
+			// Do nothing this mode is not checked on note received
+			break;
+		}
+		default: {
+			logger->error("Non-conforming light_mode found for note, {}", match->get_note());
+			break;
 		}
 	}
 }

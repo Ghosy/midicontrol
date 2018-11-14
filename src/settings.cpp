@@ -214,7 +214,12 @@ void config::insert_note(std::vector<unsigned char> lows, std::vector<unsigned c
 			for(unsigned char k = lows[2]; k <= highs[2]; ++k) {
 				new_entry = Entry({i, j, k}, action, mode, (char)light_value, light_command);
 				// Store entry
-				note_list.insert(new_entry);
+				auto ret = note_list.insert(new_entry);
+
+				// If entry wasn't inserted
+				if(!ret.second) {
+					logger->warn("{} was not added, because it already exists in the added entries", new_entry.get_note());
+				}
 			}
 		}
 	}
