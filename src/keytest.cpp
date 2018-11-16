@@ -162,7 +162,7 @@ void scan_ports() {
 		midiout = new RtMidiOut();
 	}
 	catch (RtMidiError &error) {
-		error.printMessage();
+		logger->error(error.getMessage());
 		exit(EXIT_FAILURE);
 	}
 
@@ -328,7 +328,7 @@ void list_ports() {
 		midiin = new RtMidiIn();
 	}
 	catch (RtMidiError &error) {
-		error.printMessage();
+		logger->error(error.getMessage());
 		exit(EXIT_FAILURE);
 	}
 	// Check inputs.
@@ -340,7 +340,7 @@ void list_ports() {
 			portName = midiin->getPortName(i);
 		}
 		catch (RtMidiError &error) {
-			error.printMessage();
+			logger->error(error.getMessage());
 			clean_up();
 			exit(EXIT_FAILURE);
 		}
@@ -351,7 +351,7 @@ void list_ports() {
 		midiout = new RtMidiOut();
 	}
 	catch (RtMidiError &error) {
-		error.printMessage();
+		logger->error(error.getMessage());
 		exit(EXIT_FAILURE);
 	}
 	// Check outputs.
@@ -362,7 +362,7 @@ void list_ports() {
 			portName = midiout->getPortName(i);
 		}
 		catch (RtMidiError &error) {
-			error.printMessage();
+			logger->error(error.getMessage());
 			clean_up();
 			exit(EXIT_FAILURE);
 		}
@@ -379,7 +379,7 @@ void input_scan(const std::string &device) {
 		midiin = new RtMidiIn();
 	}
 	catch (RtMidiError &error) {
-		error.printMessage();
+		logger->error(error.getMessage());
 		exit(EXIT_FAILURE);
 	}
 
