@@ -293,8 +293,6 @@ unsigned int config::stoi_check(const std::string& s) {
 
 // TODO: Fix ambiguous naming
 namespace prog_settings {
-	bool quiet = false;
-	bool silent = false;
 	bool disable_lights = false;
 	unsigned int delay = 50;
 }

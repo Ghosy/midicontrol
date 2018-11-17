@@ -238,7 +238,9 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 		perror("Fork failed");
 	}
 	if(pid == 0) {
-		if(prog_settings::quiet || prog_settings::silent) {
+		// Silence command output if quiet or silent
+		auto level = logger->sinks()[0]->level();
+		if(level > spdlog::level::info) {
 			int fd = open("/dev/null", O_WRONLY);
 			dup2(fd, 1);
 		}
