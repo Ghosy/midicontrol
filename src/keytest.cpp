@@ -476,9 +476,9 @@ void light_state_loop() {
 				char buffer[max_buffer] = "";
 
 				while(!feof(stream)) {
-					if(fgets(buffer, max_buffer, stream) != NULL) data.append(buffer);
+					if(fgets(buffer, max_buffer, stream) != NULL)
+						data.append(buffer);
 				}
-
 				pclose(stream);
 			}
 			unsigned char new_light_value = std::stoi(data);
