@@ -47,8 +47,7 @@ enum class LightMode {
 	LIGHT_VAR
 };
 
-class Entry
-{
+class Entry {
 	public:
 		/**
 		 * @brief Create empty Entry
