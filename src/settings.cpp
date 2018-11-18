@@ -171,37 +171,40 @@ void config::read_entry(YAML::Node yaml_entry) {
 // TODO: Try and clean this up. It's a mess
 void config::create_off_entries() {
 	for(const auto &entry: note_list) {
-		if(entry.light_mode == LightMode::LIGHT_PUSH) {
-			// Try to find midi note off, aka xx,xx,00
-			Entry off_entry1({entry.note[0], entry.note[1], 0}, "");
-			// Try to find midi note off, aka xx-16,xx,xx
-			Entry off_entry2({static_cast<unsigned char>(entry.note[0] - 16), entry.note[1], entry.note[2]}, "");
+		// Skip anything that doesn't use push
+		if(entry.light_mode != LightMode::LIGHT_PUSH) {
+			continue;
+		}
 
-			std::vector<Entry> off_entries = {off_entry1, off_entry2};
+		// Try to find midi note off, aka xx,xx,00
+		Entry off_entry1({entry.note[0], entry.note[1], 0}, "");
+		// Try to find midi note off, aka xx-16,xx,xx
+		Entry off_entry2({static_cast<unsigned char>(entry.note[0] - 16), entry.note[1], entry.note[2]}, "");
 
-			for(const auto &off_entry: off_entries) {
-				auto it_find = settings.note_list.find(off_entry);
+		std::vector<Entry> off_entries = {off_entry1, off_entry2};
 
-				// If off note found
-				if(it_find != settings.note_list.end()) {
-					// Modify entry for found
-					if(it_find->light_mode == LightMode::NONE) {
-						// Create modified version of found
-						Entry new_entry(it_find->note, it_find->action, LightMode::LIGHT_OFF, (unsigned char)0);
-						// Remove found and insert modified
-						note_list.erase(it_find);
-						note_list.insert(new_entry);
-					}
-					else {
-						// Print error light_mode used incorrectly
-						logger->warn("{} has a light mode with a corresponding note on, which has light_push", it_find->get_note());
-						logger->warn("{} should not have a light_mode, if using light_push on a corresponding note", it_find->get_note());
-					}
-				}
-				else {
-					Entry new_entry(off_entry.note, "", LightMode::LIGHT_OFF, (unsigned char)0);
+		for(const auto &off_entry: off_entries) {
+			auto it_find = settings.note_list.find(off_entry);
+
+			// If off note found
+			if(it_find != settings.note_list.end()) {
+				// Modify entry for found
+				if(it_find->light_mode == LightMode::NONE) {
+					// Create modified version of found
+					Entry new_entry(it_find->note, it_find->action, LightMode::LIGHT_OFF, (unsigned char)0);
+					// Remove found and insert modified
+					note_list.erase(it_find);
 					note_list.insert(new_entry);
 				}
+				else {
+					// Print error light_mode used incorrectly
+					logger->warn("{} has a light mode with a corresponding note on, which has light_push", it_find->get_note());
+					logger->warn("{} should not have a light_mode, if using light_push on a corresponding note", it_find->get_note());
+				}
+			}
+			else {
+				Entry new_entry(off_entry.note, "", LightMode::LIGHT_OFF, (unsigned char)0);
+				note_list.insert(new_entry);
 			}
 		}
 	}
