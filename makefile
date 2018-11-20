@@ -14,7 +14,7 @@ TARGET := $(BINDIR)/midicontrol
 # Documents directory
 DOCSDIR := doc
 # Tests directory
-TESTDIR := tests
+TESTDIR := test
 
 # Libraries linked to exec
 LIBS = -lrtmidi -lboost_regex -lyaml-cpp -lpthread

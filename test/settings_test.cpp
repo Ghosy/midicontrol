@@ -5,7 +5,7 @@
 
 TEST_CASE("Settings") {
 	// TODO: This assumes the context the bin is run from and shouldn't
-	settings.commandline_config("tests/conf/testconfig");
+	settings.commandline_config("test/conf/testconfig");
 	settings.read();
 
 	REQUIRE(settings.get_device() == "Test:Test MIDI 1");
