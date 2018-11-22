@@ -228,7 +228,7 @@ void midi_read(double, std::vector<unsigned char> *note_raw, void *) {
 
 	logger->debug("Entry Note: {}  Executing: {}", temp_entry.get_note(), match->action);
 	// TODO: Should this be hardcoded with note[2]?
-	std::string command = note_replace(match->action, (int)temp_entry.note[2]);
+	std::string command = note_replace(match->action, static_cast<int>(temp_entry.note[2]));
 
 	// Ensure all children are reaped
 	signal(SIGCHLD, SIG_IGN);
@@ -453,7 +453,7 @@ void light_state_loop() {
 			// Positive response(grep found)
 			if(ret == 0) {
 				// Turn on led
-				note_send({e.note[0], e.note[1], (unsigned char)e.light_value});
+				note_send({e.note[0], e.note[1], static_cast<unsigned char>(e.light_value)});
 			}
 			// Negative response(grep failed to find)
 			else if(ret == 1) {

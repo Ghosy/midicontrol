@@ -165,7 +165,7 @@ void config::read_entry(YAML::Node yaml_entry) {
 		logger->warn("{} is not a valid light value", new_light_value);
 	}
 
-	insert_note(lows, highs, new_command, new_mode, (unsigned char)new_light_value, new_light_command);
+	insert_note(lows, highs, new_command, new_mode, static_cast<unsigned char>(new_light_value), new_light_command);
 }
 
 // TODO: Try and clean this up. It's a mess
@@ -191,7 +191,7 @@ void config::create_off_entries() {
 				// Modify entry for found
 				if(it_find->light_mode == LightMode::NONE) {
 					// Create modified version of found
-					Entry new_entry(it_find->note, it_find->action, LightMode::LIGHT_OFF, (unsigned char)0);
+					Entry new_entry(it_find->note, it_find->action, LightMode::LIGHT_OFF, static_cast<unsigned char>(0));
 					// Remove found and insert modified
 					note_list.erase(it_find);
 					note_list.insert(new_entry);
@@ -203,7 +203,7 @@ void config::create_off_entries() {
 				}
 			}
 			else {
-				Entry new_entry(off_entry.note, "", LightMode::LIGHT_OFF, (unsigned char)0);
+				Entry new_entry(off_entry.note, "", LightMode::LIGHT_OFF, static_cast<unsigned char>(0));
 				note_list.insert(new_entry);
 			}
 		}
@@ -215,7 +215,7 @@ void config::insert_note(std::vector<unsigned char> lows, std::vector<unsigned c
 	for(unsigned char i = lows[0]; i <= highs[0]; ++i) {
 		for(unsigned char j = lows[1]; j <= highs[1]; ++j) {
 			for(unsigned char k = lows[2]; k <= highs[2]; ++k) {
-				new_entry = Entry({i, j, k}, action, mode, (char)light_value, light_command);
+				new_entry = Entry({i, j, k}, action, mode, static_cast<unsigned char>(light_value), light_command);
 				// Store entry
 				auto ret = note_list.insert(new_entry);
 
@@ -260,8 +260,8 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::parse_
 				logger->warn("{} is not a valid value for a note", high);
 			}
 
-			lows.push_back((unsigned char)low);
-			highs.push_back((unsigned char)high);
+			lows.push_back(static_cast<unsigned char>(low));
+			highs.push_back(static_cast<unsigned char>(high));
 		}
 		// If string doesn't contain ".."
 		else {
@@ -272,8 +272,8 @@ std::pair<std::vector<unsigned char>, std::vector<unsigned char>> config::parse_
 				logger->warn("{} is not a valid value for a note", val);
 			}
 
-			lows.push_back((unsigned char)val);
-			highs.push_back((unsigned char)val);
+			lows.push_back(static_cast<unsigned char>(val));
+			highs.push_back(static_cast<unsigned char>(val));
 		}
 	}
 	return make_pair(lows, highs);
