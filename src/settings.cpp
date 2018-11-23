@@ -186,25 +186,25 @@ void config::create_off_entries() {
 		for(const auto &off_entry: off_entries) {
 			auto it_find = settings.note_list.find(off_entry);
 
-			// If off note found
-			if(it_find != settings.note_list.end()) {
-				// Modify entry for found
-				if(it_find->light_mode == LightMode::NONE) {
-					// Create modified version of found
-					Entry new_entry(it_find->note, it_find->action, LightMode::LIGHT_OFF, static_cast<unsigned char>(0));
-					// Remove found and insert modified
-					note_list.erase(it_find);
-					note_list.insert(new_entry);
-				}
-				else {
-					// Print error light_mode used incorrectly
-					logger->warn("{} has a light mode with a corresponding note on, which has light_push", it_find->get_note());
-					logger->warn("{} should not have a light_mode, if using light_push on a corresponding note", it_find->get_note());
-				}
-			}
-			else {
+			// If no off note found; add it and continue
+			if(it_find == settings.note_list.end()) {
 				Entry new_entry(off_entry.note, "", LightMode::LIGHT_OFF, static_cast<unsigned char>(0));
 				note_list.insert(new_entry);
+				continue;
+			}
+
+			// Modify entry of fonud off note
+			if(it_find->light_mode == LightMode::NONE) {
+				// Create modified version of found
+				Entry new_entry(it_find->note, it_find->action, LightMode::LIGHT_OFF, static_cast<unsigned char>(0));
+				// Remove found and insert modified
+				note_list.erase(it_find);
+				note_list.insert(new_entry);
+			}
+			else {
+				// Print error light_mode used incorrectly
+				logger->warn("{} has a light mode with a corresponding note on, which has light_push", it_find->get_note());
+				logger->warn("{} should not have a light_mode, if using light_push on a corresponding note", it_find->get_note());
 			}
 		}
 	}
