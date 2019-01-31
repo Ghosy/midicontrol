@@ -82,6 +82,7 @@ $(BIN_INSTALL):
 $(MAN_INSTALL):
 	install -Dm 644 doc/midicontrol.1 $(DESTDIR)$(PREFIX)/share/man/man1/
 	gzip $(DESTDIR)$(PREFIX)/share/man/man1/midicontrol.1
+	mandb -q
 
 $(BSH_COMP_INSTALL):
 	install -Dm 644 doc/midicontrol.bashcomp $@
