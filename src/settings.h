@@ -38,6 +38,7 @@ struct config {
 	std::string get_device();
 
 private:
+	void read_device(YAML::Node);
 	void read_entry(YAML::Node);
 	void create_off_entries();
 	std::vector<std::string> config_file_path;

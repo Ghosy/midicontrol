@@ -85,22 +85,26 @@ void config::read() {
 
 	// Each device in config
 	for(YAML::Node device: config["devices"]) {
-		midi_device = device["device"].as<std::string>();
-
-		// If no valid notes for device
-		if(!device["notes"].IsSequence() && !device["notes"]) {
-			logger->error("No valid notes found for {}", device["device"].as<std::string>());
-			exit(EXIT_FAILURE);
-		}
-
-		// Each note for device
-		for(YAML::Node yaml_entry: device["notes"]) {
-			read_entry(yaml_entry);
-		}
+		read_device(device);
 	}
 
 	// Look through all entries for LIGHT_PUSH missing LIGHT_OFF
 	create_off_entries();
+}
+
+void config::read_device(YAML::Node device) {
+	midi_device = device["device"].as<std::string>();
+
+	// If no valid notes for device
+	if(!device["notes"].IsSequence() && !device["notes"]) {
+		logger->error("No valid notes found for {}", device["device"].as<std::string>());
+		exit(EXIT_FAILURE);
+	}
+
+	// Each note for device
+	for(YAML::Node yaml_entry: device["notes"]) {
+		read_entry(yaml_entry);
+	}
 }
 
 void config::read_entry(YAML::Node yaml_entry) {
