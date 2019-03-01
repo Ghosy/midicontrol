@@ -77,6 +77,10 @@ void config::read() {
 		exit(EXIT_FAILURE);
 	}
 
+	if(config["settings"] && !config["settings"].IsSequence()) {
+		logger->warn("The settings section in the configuration file is incorrectly formatted and will not be loaded");
+	}
+
 	// If no valid devices in config
 	if(!config["devices"].IsSequence() && !config["devices"]) {
 		logger->error("No valid devices found in configuration file");
@@ -90,6 +94,15 @@ void config::read() {
 
 	// Look through all entries for LIGHT_PUSH missing LIGHT_OFF
 	create_off_entries();
+
+	if(config["settings"] && config["settings"].IsSequence()) {
+		for(YAML::Node setting: config["settings"]) {
+			read_setting(setting);
+		}
+	}
+}
+
+void config::read_setting(YAML::Node setting) {
 }
 
 void config::read_device(YAML::Node device) {
