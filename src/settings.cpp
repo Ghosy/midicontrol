@@ -82,7 +82,7 @@ void config::read() {
 	}
 
 	// If no valid devices in config
-	if(!config["devices"].IsSequence() && !config["devices"]) {
+	if(!config["devices"] || !config["devices"].IsSequence()) {
 		logger->error("No valid devices found in configuration file");
 		exit(EXIT_FAILURE);
 	}
