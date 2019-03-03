@@ -77,7 +77,7 @@ void config::read() {
 		exit(EXIT_FAILURE);
 	}
 
-	if(config["settings"] && !config["settings"].IsSequence()) {
+	if(config["settings"] && !config["settings"].IsMap()) {
 		logger->warn("The settings section in the configuration file is incorrectly formatted and will not be loaded");
 	}
 
@@ -95,14 +95,34 @@ void config::read() {
 	// Look through all entries for LIGHT_PUSH missing LIGHT_OFF
 	create_off_entries();
 
-	if(config["settings"] && config["settings"].IsSequence()) {
-		for(YAML::Node setting: config["settings"]) {
-			read_setting(setting);
-		}
+	if(config["settings"] && config["settings"].IsMap()) {
+		read_settings(config["settings"]);
 	}
 }
 
-void config::read_setting(YAML::Node setting) {
+void config::read_settings(YAML::Node settings) {
+	logger->debug("Reading settings from config file");
+	if(settings["check_delay"]) {
+		unsigned int new_delay = settings["check_delay"].as<unsigned int>();
+		prog_settings::delay = new_delay;;
+		logger->debug("Check delay set to {} from config", new_delay);
+	}
+	if(settings["lights"]) {
+		bool lights_disabled = settings["lights"].as<bool>();
+		prog_settings::disable_lights = lights_disabled;
+		if(!lights_disabled) {
+			logger->debug("Lights set enabled from config");
+		}
+		else {
+			logger->debug("Lights set disabled from config");
+		}
+	}
+	if(settings["logging"]) {
+		logger->warn("Logging settings are not implemented for configuration file yet");
+	}
+	if(settings["verbosity"]) {
+		logger->warn("Verbosity settings are not implemented for configuration files yet");
+	}
 }
 
 void config::read_device(YAML::Node device) {

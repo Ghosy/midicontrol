@@ -38,7 +38,7 @@ struct config {
 	std::string get_device();
 
 private:
-	void read_setting(YAML::Node);
+	void read_settings(YAML::Node);
 	void read_device(YAML::Node);
 	void read_entry(YAML::Node);
 	void create_off_entries();
