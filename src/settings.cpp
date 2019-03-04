@@ -129,7 +129,7 @@ void config::read_device(YAML::Node device) {
 	midi_device = device["device"].as<std::string>();
 
 	// If no valid notes for device
-	if(!device["notes"].IsSequence() && !device["notes"]) {
+	if(!device["notes"] || !device["notes"].IsSequence()) {
 		logger->error("No valid notes found for {}", device["device"].as<std::string>());
 		exit(EXIT_FAILURE);
 	}
