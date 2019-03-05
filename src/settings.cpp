@@ -108,9 +108,9 @@ void config::read_settings(YAML::Node settings) {
 		logger->debug("Check delay set to {} from config", new_delay);
 	}
 	if(settings["lights"]) {
-		bool lights_disabled = settings["lights"].as<bool>();
-		prog_settings::disable_lights = lights_disabled;
-		if(!lights_disabled) {
+		bool lights_enabled = settings["lights"].as<bool>();
+		prog_settings::disable_lights = !lights_enabled;
+		if(lights_enabled) {
 			logger->debug("Lights set enabled from config");
 		}
 		else {
@@ -118,7 +118,14 @@ void config::read_settings(YAML::Node settings) {
 		}
 	}
 	if(settings["logging"]) {
-		logger->warn("Logging settings are not implemented for configuration file yet");
+		bool logging_enabled = settings["logging"].as<bool>();
+		if(logging_enabled) {
+			logger->debug("Logging set enabled from config");
+		}
+		else {
+			logger->sinks()[1]->set_level(spdlog::level::off);
+			logger->debug("Logging set disabled from config");
+		}
 	}
 	if(settings["verbosity"]) {
 		logger->warn("Verbosity settings are not implemented for configuration files yet");
