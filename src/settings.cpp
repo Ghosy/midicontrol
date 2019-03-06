@@ -128,7 +128,18 @@ void config::read_settings(YAML::Node settings) {
 		}
 	}
 	if(settings["verbosity"]) {
-		logger->warn("Verbosity settings are not implemented for configuration files yet");
+		std::string verbosity_level = settings["verbosity"].as<std::string>();
+		if(verbosity_level == "quiet") {
+			logger->sinks()[0]->set_level(spdlog::level::err);
+		}
+		else if(verbosity_level == "silent") {
+			logger->sinks()[0]->set_level(spdlog::level::off);
+		}
+		else if(verbosity_level == "normal") {
+		}
+		else if(verbosity_level == "verbose") {
+			logger->sinks()[0]->set_level(spdlog::level::debug);
+		}
 	}
 }
 
