@@ -131,14 +131,21 @@ void config::read_settings(YAML::Node settings) {
 		std::string verbosity_level = settings["verbosity"].as<std::string>();
 		if(verbosity_level == "quiet") {
 			logger->sinks()[0]->set_level(spdlog::level::err);
+			logger->debug("Verbosity set to quiet from config");
 		}
 		else if(verbosity_level == "silent") {
 			logger->sinks()[0]->set_level(spdlog::level::off);
+			logger->debug("Verbosity set to silent from config");
 		}
 		else if(verbosity_level == "normal") {
+			logger->debug("Verbosity set to normal from config");
 		}
 		else if(verbosity_level == "verbose") {
 			logger->sinks()[0]->set_level(spdlog::level::debug);
+			logger->debug("Verbosity set to verbose from config");
+		}
+		else {
+			logger->error("{} is not a valid verbosity level", verbosity_level);
 		}
 	}
 }
