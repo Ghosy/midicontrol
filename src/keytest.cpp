@@ -48,29 +48,8 @@ static void finish(int){
 }
 
 int main(int argc, char* argv[]) {
-	// Setup logger
-	try {
-		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
-		// Set level and pattern
-		console_sink->set_level(spdlog::level::info);
-		console_sink->set_pattern("[%^%l%$] %v");
+	init_logger();
 
-		auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(settings.log_path, (1024 * 1024), 3);
-		file_sink->set_level(spdlog::level::trace);
-		file_sink->set_pattern("[%Y-%m-%d %T.%e] [%l] %v");
-
-		auto new_logger = std::make_shared<spdlog::logger>("multi_sink", spdlog::sinks_init_list{console_sink, file_sink});
-
-		// Don't forget to let all info through logger to sinks
-		new_logger->set_level(spdlog::level::trace);
-		spdlog::register_logger(new_logger);
-
-		// Set global var
-		logger = spdlog::get("multi_sink");
-	}
-	catch(const spdlog::spdlog_ex &ex) {
-		std::cerr << "Log initialization failed: " << ex.what() << std::endl;
-	}
 	// Cases for all arguments
 	for(int i = 1; i < argc; ++i) {
 		std::string arg = argv[i];
@@ -151,6 +130,31 @@ int main(int argc, char* argv[]) {
 	}
 	scan_ports();
 	exit(EXIT_SUCCESS);
+}
+
+void init_logger() {
+	try {
+		auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+		// Set level and pattern
+		console_sink->set_level(spdlog::level::info);
+		console_sink->set_pattern("[%^%l%$] %v");
+
+		auto file_sink = std::make_shared<spdlog::sinks::rotating_file_sink_mt>(settings.log_path, (1024 * 1024), 3);
+		file_sink->set_level(spdlog::level::trace);
+		file_sink->set_pattern("[%Y-%m-%d %T.%e] [%l] %v");
+
+		auto new_logger = std::make_shared<spdlog::logger>("multi_sink", spdlog::sinks_init_list{console_sink, file_sink});
+
+		// Don't forget to let all info through logger to sinks
+		new_logger->set_level(spdlog::level::trace);
+		spdlog::register_logger(new_logger);
+
+		// Set global var
+		logger = spdlog::get("multi_sink");
+	}
+	catch(const spdlog::spdlog_ex &ex) {
+		std::cerr << "Log initialization failed: " << ex.what() << std::endl;
+	}
 }
 
 void scan_ports() {
