@@ -128,6 +128,13 @@ int main(int argc, char* argv[]) {
 			exit(EXIT_SUCCESS);
 		}
 	}
+	// Read config file
+	settings.read();
+
+	// Log all current settings
+	log_settings();
+
+	// Begin main task
 	scan_ports();
 	exit(EXIT_SUCCESS);
 }
@@ -157,9 +164,43 @@ void init_logger() {
 	}
 }
 
+void log_settings() {
+	logger->debug("---Midicontrol Setup");
+	logger->debug("  Device: {}", settings.get_device());
+
+	std::string logging_status;
+	if(logger->sinks()[1]->level() == spdlog::level::off) {
+		logging_status = "Disabled";
+	}
+	else {
+		logging_status = "Enabled";
+	}
+	logger->debug("  Logging: {}", logging_status);
+
+	std::string verbosity_status;
+	if(logger->sinks()[0]->level() == spdlog::level::off) {
+		verbosity_status = "Silent";
+	}
+	else if(logger->sinks()[0]->level() == spdlog::level::err) {
+		verbosity_status = "Quiet";
+	}
+	else if(logger->sinks()[0]->level() == spdlog::level::debug) {
+		verbosity_status = "Verbose";
+	}
+	else if(logger->sinks()[0]->level() == spdlog::level::info) {
+		verbosity_status = "Standard";
+	}
+	else {
+		verbosity_status = "Unsupported";
+		logger->error("Unexpected level found");
+	}
+	logger->debug("  Logging: {}", verbosity_status);
+
+	logger->debug("  Check Delay: {}", prog_settings::delay);
+}
+
 void scan_ports() {
 	logger->debug("---Starting midicontrol");
-	settings.read();
 
 	try {
 		midiin = new RtMidiIn();

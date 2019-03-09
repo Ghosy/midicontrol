@@ -36,6 +36,11 @@ void midi_read(double deltatime, std::vector<unsigned char> *note_raw, void *use
 void init_logger();
 
 /**
+ * @brief Log all program settings before running
+ */
+void log_settings();
+
+/**
  * @brief Open midi device to read incoming signals and convert to actions
  */
 void scan_ports();
