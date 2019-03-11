@@ -177,6 +177,15 @@ void log_settings() {
 	}
 	logger->debug("  Logging: {}", logging_status);
 
+	std::string logging_path;
+	if(logger->sinks()[1]->level() == spdlog::level::off) {
+		logging_path = "N/A";
+	}
+	else {
+		logging_path = settings.log_path;
+	}
+	logger->debug("  Log Path: {}", logging_path);
+
 	std::string verbosity_status;
 	if(logger->sinks()[0]->level() == spdlog::level::off) {
 		verbosity_status = "Silent";
@@ -194,7 +203,7 @@ void log_settings() {
 		verbosity_status = "Unsupported";
 		logger->error("Unexpected level found");
 	}
-	logger->debug("  Logging: {}", verbosity_status);
+	logger->debug("  Verbosity: {}", verbosity_status);
 
 	logger->debug("  Check Delay: {}", prog_settings::delay);
 }
