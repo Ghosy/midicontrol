@@ -57,6 +57,7 @@ extern config settings;
 namespace prog_settings {
 	extern bool disable_lights;
 	extern unsigned int delay;
+	extern std::string config_file;
 }
 
 #endif

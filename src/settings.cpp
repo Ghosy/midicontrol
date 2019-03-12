@@ -53,24 +53,23 @@ void config::read() {
 	// Get logger
 	logger = spdlog::get("multi_sink");
 
-	std::string config_file;
 	// Check all possible config paths
 	for(const auto &path: config_file_path) {
 		std::ifstream f(path.c_str());
 		// Check current file
 		if(f.good()) {
-			config_file = path;
+			prog_settings::config_file = path;
 			break;
 		}
 		logger->debug("{} cannot be read", path);
 	}
 	YAML::Node config;
 
-	logger->debug("Reading Config File: {}", config_file);
+	logger->debug("Reading Config File: {}", prog_settings::config_file);
 	
 	// Ensure the file trying to be loaded exists before trying
-	if(!config_file.empty()) {
-		config = YAML::LoadFile(config_file);
+	if(!prog_settings::config_file.empty()) {
+		config = YAML::LoadFile(prog_settings::config_file);
 	}
 	else {
 		logger->error("No valid configuration file found");
@@ -360,5 +359,6 @@ unsigned int config::stoi_check(const std::string& s) {
 namespace prog_settings {
 	bool disable_lights = false;
 	unsigned int delay = 50;
+	std::string config_file;
 }
 /* vim: set ts=8 sw=8 tw=0 noet :*/

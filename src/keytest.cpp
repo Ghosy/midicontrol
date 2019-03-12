@@ -168,6 +168,8 @@ void log_settings() {
 	logger->debug("---Midicontrol Setup");
 	logger->debug("  Device: {}", settings.get_device());
 
+	logger->debug("  Config: {}", prog_settings::config_file);
+
 	std::string logging_status;
 	if(logger->sinks()[1]->level() == spdlog::level::off) {
 		logging_status = "Disabled";
