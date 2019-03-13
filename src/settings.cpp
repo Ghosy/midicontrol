@@ -128,24 +128,27 @@ void config::read_settings(YAML::Node settings) {
 	}
 	if(settings["verbosity"]) {
 		std::string verbosity_level = settings["verbosity"].as<std::string>();
+		std::string verbosity_name;
 		if(verbosity_level == "quiet") {
 			logger->sinks()[0]->set_level(spdlog::level::err);
-			logger->debug("Verbosity set to quiet from config");
+			verbosity_name = config::get_verbosity_name(spdlog::level::err);
 		}
 		else if(verbosity_level == "silent") {
 			logger->sinks()[0]->set_level(spdlog::level::off);
-			logger->debug("Verbosity set to silent from config");
+			verbosity_name = config::get_verbosity_name(spdlog::level::off);
 		}
 		else if(verbosity_level == "normal") {
-			logger->debug("Verbosity set to normal from config");
+			verbosity_name = config::get_verbosity_name(spdlog::level::info);
 		}
 		else if(verbosity_level == "verbose") {
 			logger->sinks()[0]->set_level(spdlog::level::debug);
-			logger->debug("Verbosity set to verbose from config");
+			verbosity_name = config::get_verbosity_name(spdlog::level::debug);
 		}
 		else {
 			logger->error("{} is not a valid verbosity level", verbosity_level);
+			verbosity_name = "Unsupported";
 		}
+		logger->debug("Verbosity set to {} from config", verbosity_name);
 	}
 }
 
@@ -353,6 +356,25 @@ unsigned int config::stoi_check(const std::string& s) {
 		logger->warn("returning 0 instead");
 	}
 	return 0;
+}
+
+std::string config::get_verbosity_name(spdlog::level::level_enum level) {
+	if(level == spdlog::level::off) {
+		return "Silent";
+	}
+	else if(level == spdlog::level::err) {
+		return "Quiet";
+	}
+	else if(level == spdlog::level::debug) {
+		return "Verbose";
+	}
+	else if(level == spdlog::level::info) {
+		return "Normal";
+	}
+	else {
+		logger->error("Unexpected level found");
+		return "Unsupported";
+	}
 }
 
 // TODO: Fix ambiguous naming

@@ -36,6 +36,7 @@ struct config {
 	void commandline_config(const char*);
 	std::set<Entry> note_list;
 	std::string get_device();
+	std::string get_verbosity_name(spdlog::level::level_enum);
 
 private:
 	void read_settings(YAML::Node);
