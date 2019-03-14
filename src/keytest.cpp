@@ -111,12 +111,15 @@ int main(int argc, char* argv[]) {
 		}
 		else if((arg == "-q") || (arg == "--quiet")) {
 			logger->sinks()[0]->set_level(spdlog::level::err);
+			prog_settings::verbosity_overridden = true;
 		}
 		else if((arg == "-s") || (arg == "--silent")) {
 			logger->sinks()[0]->set_level(spdlog::level::off);
+			prog_settings::verbosity_overridden = true;
 		}
 		else if((arg == "-v") || (arg == "--verbose")) {
 			logger->sinks()[0]->set_level(spdlog::level::debug);
+			prog_settings::verbosity_overridden = true;
 		}
 		else if(arg == "--version") {
 			show_version();

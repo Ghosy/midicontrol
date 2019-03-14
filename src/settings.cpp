@@ -128,6 +128,11 @@ void config::read_settings(YAML::Node settings) {
 	}
 	if(settings["verbosity"]) {
 		std::string verbosity_level = settings["verbosity"].as<std::string>();
+		if(prog_settings::verbosity_overridden) {
+			logger->debug("Verbosity not changed by config as it has been set by a command-line option");
+			return;
+		}
+
 		std::string verbosity_name;
 		if(verbosity_level == "quiet") {
 			logger->sinks()[0]->set_level(spdlog::level::err);
@@ -382,5 +387,6 @@ namespace prog_settings {
 	bool disable_lights = false;
 	unsigned int delay = 50;
 	std::string config_file;
+	bool verbosity_overridden = false;
 }
 /* vim: set ts=8 sw=8 tw=0 noet :*/
