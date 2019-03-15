@@ -128,32 +128,33 @@ void config::read_settings(YAML::Node settings) {
 	}
 	if(settings["verbosity"]) {
 		std::string verbosity_level = settings["verbosity"].as<std::string>();
-		if(prog_settings::verbosity_overridden) {
-			logger->debug("Verbosity not changed by config as it has been set by a command-line option");
-			return;
-		}
 
-		std::string verbosity_name;
+		spdlog::level::level_enum level;
 		if(verbosity_level == "quiet") {
-			logger->sinks()[0]->set_level(spdlog::level::err);
-			verbosity_name = config::get_verbosity_name(spdlog::level::err);
+			level = spdlog::level::err;
 		}
 		else if(verbosity_level == "silent") {
-			logger->sinks()[0]->set_level(spdlog::level::off);
-			verbosity_name = config::get_verbosity_name(spdlog::level::off);
+			level = spdlog::level::off;
 		}
 		else if(verbosity_level == "normal") {
-			verbosity_name = config::get_verbosity_name(spdlog::level::info);
+			level = spdlog::level::info;
 		}
 		else if(verbosity_level == "verbose") {
-			logger->sinks()[0]->set_level(spdlog::level::debug);
-			verbosity_name = config::get_verbosity_name(spdlog::level::debug);
+			level = spdlog::level::debug;
 		}
 		else {
+			level = spdlog::level::info;
 			logger->error("{} is not a valid verbosity level", verbosity_level);
-			verbosity_name = "Unsupported";
 		}
-		logger->debug("Verbosity set to {} from config", verbosity_name);
+
+		if(prog_settings::verbosity_overridden) {
+			logger->debug("Verbosity not changed by config as it has already been set by a command-line option");
+		}
+		else {
+			logger->sinks()[0]->set_level(level);
+			std::string verbosity_name = config::get_verbosity_name(level);
+			logger->debug("Verbosity set to {} from config", verbosity_name);
+		}
 	}
 }
 
