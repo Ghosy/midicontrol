@@ -210,7 +210,7 @@ void log_settings() {
 	}
 	logger->debug("  Verbosity: {}", verbosity_status);
 
-	logger->debug("  Check Delay: {}", prog_settings::delay);
+	logger->debug("  Check Delay: {}ms", prog_settings::delay);
 }
 
 void scan_ports() {
